@@ -2,7 +2,6 @@
 <resources>
     <string name="nav_home">Главная</string>
     <string name="nav_modules">Модули</string>
-    <string name="nav_store">Репозиторий</string>
     <string name="nav_logs">Журнал</string>
 
     <string name="panels_done">Готово</string>
@@ -42,8 +41,6 @@
     <string name="info_not_injected">Не внедрён</string>
     <string name="status_notification">Уведомление о состоянии</string>
     <string name="status_notification_summary">Постоянное уведомление о том, что Vector работает.</string>
-    <string name="action_copy_all">Скопировать всё</string>
-    <string name="copied">Скопировано в буфер обмена</string>
     <string name="home_quarter_title">Недавняя активность</string>
     <plurals name="home_commit_count">
         <item quantity="one">%1$d коммит</item>
@@ -289,16 +286,9 @@
     <string name="update_failed_start">Не удалось запустить установщик.</string>
     <string name="update_failed_download">Не удалось загрузить обновление.</string>
     <string name="update_failed_exit">Установщик завершился с ошибкой (код %1$d).</string>
-    <string name="store_mute_updates">Не сообщать об обновлениях этого модуля</string>
-    <string name="store_mute_updates_summary">Он перестанет считаться устаревшим и здесь, и в списке модулей</string>
-    <string name="store_options">Параметры</string>
     <string name="scope_framework_shared">Один процесс на всех пользователей — это затрагивает всё устройство</string>
     <string name="scope_self_hook">Модуль загружается в собственное приложение — так он и сообщает, что активен</string>
     <string name="update_no_output">Установщик ничего не вывел.</string>
-    <string name="update_variant_release">Стабильная</string>
-    <string name="update_variant_debug">Отладочная</string>
-    <string name="update_variant_release_why">Сборка на каждый день</string>
-    <string name="update_variant_debug_why">Подробные логи, для отчёта об ошибке</string>
     <string name="update_versions">Все версии</string>
     <string name="update_installed">Установлена</string>
     <string name="update_older">Старее</string>
@@ -402,7 +392,6 @@
         <item quantity="many">ещё %1$d кадров стека, таких же, как выше</item>
         <item quantity="other">ещё %1$d кадров стека, таких же, как выше</item>
     </plurals>
-    <string name="crash_frame_copied">Кадр скопирован</string>
     <string name="crash_unreadable">Этот сбой не удалось прочитать. Скопируйте его и приложите к отчёту как есть.</string>
     <string name="force_launcher_icons">Не давать приложениям скрывать значок в лаунчере</string>
     <string name="force_launcher_icons_summary">Начиная с Android 10, приложение, которое скрывает свой значок в лаунчере, получает его обратно, и этот значок открывает страницу сведений о приложении. Выключите это, чтобы значок оставался скрытым — лаунчер может обновить свой список только после перезапуска. Приложений, у которых значка в лаунчере никогда не было, включая большинство модулей, это не касается.</string>

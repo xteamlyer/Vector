@@ -3,7 +3,6 @@
 
     <string name="nav_home">Inicio</string>
     <string name="nav_modules">Módulos</string>
-    <string name="nav_store">Catálogo</string>
     <string name="nav_logs">Registros</string>
 
     <string name="panels_done">Listo</string>
@@ -46,9 +45,6 @@
     <string name="info_not_injected">No inyectado</string>
     <string name="status_notification">Notificación de estado</string>
     <string name="status_notification_summary">Una notificación permanente que indica que Vector está en marcha.</string>
-    <string name="action_copy_all">Copiar todo</string>
-    <string name="copied">Copiado al portapapeles</string>
-
     <string name="home_quarter_title">Actividad reciente</string>
     <plurals name="home_commit_count">
         <item quantity="one">%1$d commit</item>
@@ -287,16 +283,9 @@
     <string name="update_failed_start">No se pudo iniciar el instalador.</string>
     <string name="update_failed_download">No se pudo descargar la actualización.</string>
     <string name="update_failed_exit">El instalador falló (código %1$d).</string>
-    <string name="store_mute_updates">Ignorar las actualizaciones de este módulo</string>
-    <string name="store_mute_updates_summary">Deja de contar como desactualizado, aquí y en la lista de módulos</string>
-    <string name="store_options">Opciones</string>
     <string name="scope_framework_shared">Un único proceso compartido por todos los usuarios: afecta a todo el dispositivo</string>
     <string name="scope_self_hook">Este módulo se carga en su propia app: así es como informa de que está activo</string>
     <string name="update_no_output">El instalador no produjo ninguna salida.</string>
-    <string name="update_variant_release">Estable</string>
-    <string name="update_variant_debug">Depuración</string>
-    <string name="update_variant_release_why">La compilación del día a día</string>
-    <string name="update_variant_debug_why">Registros detallados, para informar de un error</string>
     <string name="update_versions">Todas las versiones</string>
     <string name="update_installed">Instalada</string>
     <string name="update_older">Anterior</string>
@@ -398,7 +387,6 @@
         <item quantity="one">%1$d marco más, igual que arriba</item>
         <item quantity="other">%1$d marcos más, iguales que arriba</item>
     </plurals>
-    <string name="crash_frame_copied">Marco copiado</string>
     <string name="crash_unreadable">No se ha podido leer este fallo. Cópialo y adjúntalo al informe tal cual.</string>
     <string name="force_launcher_icons">Impedir que las apps oculten su icono del launcher</string>
     <string name="force_launcher_icons_summary">Desde Android 10, a una app que oculta su propio icono del launcher se le devuelve uno que abre su página de información de la app. Desactiva esta opción para que pueda seguir oculta: puede que tu launcher no se dé cuenta hasta que se reinicie. Las apps que nunca tuvieron icono en el launcher, incluida la mayoría de los módulos, no se ven afectadas.</string>

@@ -3,7 +3,6 @@
 
     <string name="nav_home">Trang chính</string>
     <string name="nav_modules">Mô-đun</string>
-    <string name="nav_store">Kho mô-đun</string>
     <string name="nav_logs">Nhật ký</string>
 
     <string name="panels_done">Xong</string>
@@ -46,9 +45,6 @@
     <string name="info_not_injected">Chưa tiêm</string>
     <string name="status_notification">Thông báo trạng thái</string>
     <string name="status_notification_summary">Một thông báo thường trực cho biết Vector đang chạy.</string>
-    <string name="action_copy_all">Sao chép tất cả</string>
-    <string name="copied">Đã sao chép vào bộ nhớ tạm</string>
-
     <string name="home_quarter_title">Hoạt động gần đây</string>
     <plurals name="home_commit_count">
         <item quantity="other">%1$d commit</item>
@@ -277,16 +273,9 @@
     <string name="update_failed_start">Không khởi chạy được trình cài đặt.</string>
     <string name="update_failed_download">Không tải được bản cập nhật.</string>
     <string name="update_failed_exit">Trình cài đặt thất bại (mã %1$d).</string>
-    <string name="store_mute_updates">Bỏ qua cập nhật của mô-đun này</string>
-    <string name="store_mute_updates_summary">Nó thôi bị tính là cũ, ở đây và trong danh sách mô-đun</string>
-    <string name="store_options">Tuỳ chọn</string>
     <string name="scope_framework_shared">Một tiến trình dùng chung cho mọi người dùng, nên việc này ảnh hưởng toàn thiết bị</string>
     <string name="scope_self_hook">Mô-đun này được nạp vào chính ứng dụng của nó, đó là cách nó báo rằng mình đang hoạt động</string>
     <string name="update_no_output">Trình cài đặt không xuất ra gì cả.</string>
-    <string name="update_variant_release">Chính thức</string>
-    <string name="update_variant_debug">Gỡ lỗi</string>
-    <string name="update_variant_release_why">Bản dùng hằng ngày</string>
-    <string name="update_variant_debug_why">Nhật ký chi tiết, để báo lỗi</string>
     <string name="update_versions">Tất cả phiên bản</string>
     <string name="update_installed">Đang dùng</string>
     <string name="update_older">Cũ hơn</string>
@@ -387,7 +376,6 @@
     <plurals name="crash_frames_elided">
         <item quantity="other">thêm %1$d khung nữa, giống như trên</item>
     </plurals>
-    <string name="crash_frame_copied">Đã sao chép khung</string>
     <string name="crash_unreadable">Không đọc được sự cố này. Hãy sao chép và đính kèm nguyên trạng vào báo cáo.</string>
     <string name="force_launcher_icons">Không cho ứng dụng ẩn biểu tượng trên trình khởi chạy</string>
     <string name="force_launcher_icons_summary">Từ Android 10, ứng dụng tự ẩn biểu tượng của mình trên trình khởi chạy sẽ được cấp lại một biểu tượng mở trang thông tin ứng dụng. Tắt mục này để nó vẫn được ẩn — trình khởi chạy có thể chưa cập nhật cho tới khi nó khởi động lại. Những ứng dụng vốn không có biểu tượng khởi chạy, gồm hầu hết mô-đun, không bị ảnh hưởng.</string>

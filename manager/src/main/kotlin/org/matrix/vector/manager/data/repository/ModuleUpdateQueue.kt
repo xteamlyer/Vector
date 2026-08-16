@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.matrix.vector.manager.data.model.ReleaseAsset
-import org.matrix.vector.manager.data.model.RepoVersion
-import org.matrix.vector.manager.data.model.StoreInstall
+import org.matrix.vector.ui.store.ReleaseAsset
+import org.matrix.vector.ui.store.RepoVersion
+import org.matrix.vector.ui.store.StoreInstall
 
 /**
  * Several module updates, installed one after another.

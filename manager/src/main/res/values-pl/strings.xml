@@ -11,7 +11,6 @@
     <!-- Navigation -->
     <string name="nav_home">Start</string>
     <string name="nav_modules">Moduły</string>
-    <string name="nav_store">Katalog</string>
     <string name="nav_logs">Dzienniki</string>
     <!-- Rearranging the panels, and the ball that can stand in for the bar -->
     <string name="panels_done">Gotowe</string>
@@ -30,7 +29,7 @@
     <!-- The framework is running but speaks a different generation of the manager interface. -->
     <string name="status_mismatched">Niezgodność wersji</string>
     <string name="status_checking">Sprawdzanie…</string>
-    <string name="status_open_details">Otwórz status systemu</string>
+    <string name="status_open_details">Otwórz stan systemu</string>
     <!-- Degraded causes, in the priority order the daemon reports them -->
     <string name="issue_sepolicy_title">Zasady SELinux nie zostały załadowane</string>
     <string name="issue_sepolicy_summary">Niektóre funkcje nie będą działać. Zwykle oznacza to, że implementacja roota nie zastosowała reguł Vectora</string>
@@ -59,7 +58,6 @@
         <item quantity="many">%1$d ramek więcej, takich samych jak powyżej</item>
         <item quantity="other">%1$d ramek więcej, takich samych jak powyżej</item>
     </plurals>
-    <string name="crash_frame_copied">Ramka skopiowana</string>
     <string name="crash_unreadable">Nie udało się odczytać tej awarii. Skopiuj ją i dołącz do raportu w obecnej formie.</string>
     <!-- System status detail -->
     <string name="system_status">Stan systemu</string>
@@ -90,8 +88,6 @@
     <string name="status_notification_summary">Stałe powiadomienie pokazujące, że Vector jest uruchomiony.</string>
     <string name="force_launcher_icons">Nie pozwalaj aplikacjom ukrywać ikon w launcherze</string>
     <string name="force_launcher_icons_summary">Od Androida 10 aplikacja, która ukrywa własną ikonę launchera, otrzymuje z powrotem jedną ikonę, która otwiera stronę informacji o aplikacji. Wyłącz to, aby pozostała ukryta — launcher może się nie zaktualizować do czasu restartu. Nie dotyczy to aplikacji, które nigdy nie miały ikony launchera, w tym większość modułów.</string>
-    <string name="action_copy_all">Kopiuj wszystko</string>
-    <string name="copied">Skopiowano do schowka</string>
     <!-- Home: the community feed -->
     <string name="home_quarter_title">Ostatnia aktywność</string>
     <!-- Example: "7 commits by 4 people" -->
@@ -382,7 +378,7 @@
     <!-- Canary builds: choosing which nightly to test, and why it is worth an evening -->
     <string name="canary_open_actions">Otwórz na GitHubie</string>
     <string name="canary_none">Nie opublikowano jeszcze żadnej kompilacji Canary.</string>
-    <string name="canary_what_title">Czym jest Canary</string>
+    <string name="canary_what_title">Czym jest Canary?</string>
     <string name="canary_what_body">Bieżący stan gałęzi master, zbudowany i sprawdzony wyłącznie przez CI, nic więcej. Poprawki trafiają tutaj dni lub tygodnie przed tym, jak trafią do wydania.</string>
     <!-- %1$d is how many canaries CI keeps -->
     <string name="canary_keep_body">Najnowsze %1$d są zachowywane, a każda strona kompilacji umożliwia przenoszenie się między nimi lub powrót do ostatniej wersji. Nic tu nie jest drzwiami w jedną stronę.</string>
@@ -452,16 +448,9 @@
     <string name="update_failed_start">Nie można uruchomić instalatora.</string>
     <string name="update_failed_download">Nie udało się pobrać aktualizacji.</string>
     <string name="update_failed_exit">Instalator zakończył się niepowodzeniem (kod wyjścia %1$d).</string>
-    <string name="store_mute_updates">Ignoruj aktualizacje tego modułu</string>
-    <string name="store_mute_updates_summary">Przestaje być liczone jako nieaktualne, tutaj i na liście modułów</string>
-    <string name="store_options">Opcje</string>
     <string name="scope_framework_shared">Jeden proces współdzielony przez każdego użytkownika, co ma wpływ na całe urządzenie</string>
     <string name="scope_self_hook">Ten moduł jest ładowany do własnej aplikacji, w ten sposób informuje o swojej aktywności</string>
     <string name="update_no_output">Instalator nie wygenerował żadnego wyniku.</string>
-    <string name="update_variant_release">Stabilna</string>
-    <string name="update_variant_debug">Debug</string>
-    <string name="update_variant_release_why">Wersja do codziennego użytku</string>
-    <string name="update_variant_debug_why">Szczegółowe rejestrowanie w celu zgłoszenia błędu</string>
     <string name="update_versions">Wszystkie wersje</string>
     <string name="update_installed">Zainstalowana</string>
     <string name="update_same_number">Ten sam numer, inna kompilacja</string>

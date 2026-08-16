@@ -13,6 +13,7 @@
 #include "framework/android_types.h"
 #include "jni/jni_bridge.h"
 #include "jni/jni_hooks.h"
+#include "jni/resources_hook.h"
 
 namespace vector::native::jni {
 
@@ -190,8 +191,8 @@ VECTOR_DEF_NATIVE_METHOD(jboolean, ResourcesHook, makeInheritable, jclass target
  *
  * @return A new dalvik.system.InMemoryDexClassLoader instance.
  */
-VECTOR_DEF_NATIVE_METHOD(jobject, ResourcesHook, buildDummyClassLoader, jobject parent,
-                         jstring resource_super_class, jstring typed_array_super_class) {
+jobject BuildDummySuperClassLoader(JNIEnv *env, jobject parent, const char *res_super,
+                                   const char *ta_super) {
     using namespace startop::dex;
 
     // Cache the class and constructor for InMemoryDexClassLoader.
@@ -205,15 +206,13 @@ VECTOR_DEF_NATIVE_METHOD(jobject, ResourcesHook, buildDummyClassLoader, jobject 
 
     // Create a class named "xposed.dummy.XResourcesSuperClass".
     ClassBuilder xresource_builder{dex_file.MakeClass("xposed/dummy/XResourcesSuperClass")};
-    // Set its superclass to the one specified by the Java caller.
-    xresource_builder.setSuperClass(
-        TypeDescriptor::FromClassname(lsplant::JUTFString(env, resource_super_class).get()));
+    // Set its superclass to the one specified by the caller.
+    xresource_builder.setSuperClass(TypeDescriptor::FromClassname(res_super));
 
     // Create a class named "xposed.dummy.XTypedArraySuperClass".
     ClassBuilder xtypearray_builder{dex_file.MakeClass("xposed/dummy/XTypedArraySuperClass")};
     // Set its superclass.
-    xtypearray_builder.setSuperClass(
-        TypeDescriptor::FromClassname(lsplant::JUTFString(env, typed_array_super_class).get()));
+    xtypearray_builder.setSuperClass(TypeDescriptor::FromClassname(ta_super));
 
     // Finalize the DEX file into a memory buffer.
     slicer::MemView image{dex_file.CreateImage()};
@@ -224,9 +223,16 @@ VECTOR_DEF_NATIVE_METHOD(jobject, ResourcesHook, buildDummyClassLoader, jobject 
     if (!dex_buffer) return nullptr;
 
     // Create and return a new InMemoryDexClassLoader instance. Released from its scope because it
-    // is handed straight back to Java.
+    // is handed straight back to the caller.
     return lsplant::JNI_NewObject(env, in_memory_classloader, initMid, dex_buffer, parent)
         .release();
+}
+
+VECTOR_DEF_NATIVE_METHOD(jobject, ResourcesHook, buildDummyClassLoader, jobject parent,
+                         jstring resource_super_class, jstring typed_array_super_class) {
+    return BuildDummySuperClassLoader(env, parent,
+                                      lsplant::JUTFString(env, resource_super_class).get(),
+                                      lsplant::JUTFString(env, typed_array_super_class).get());
 }
 
 /**

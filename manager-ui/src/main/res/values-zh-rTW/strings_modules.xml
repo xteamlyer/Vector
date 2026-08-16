@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="modules_collapse">收合</string>
+    <string name="modules_expand">顯示完整說明</string>
+</resources>

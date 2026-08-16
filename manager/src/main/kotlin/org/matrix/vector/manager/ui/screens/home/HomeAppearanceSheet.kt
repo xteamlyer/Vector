@@ -66,18 +66,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.matrix.vector.manager.ui.theme.LocalizedOverlay
 import org.matrix.vector.manager.R
-import org.matrix.vector.manager.ui.components.ChoiceRow
-import org.matrix.vector.manager.ui.components.SheetAction
-import org.matrix.vector.manager.ui.components.SheetHeading
-import org.matrix.vector.manager.ui.components.StatusNote
-import org.matrix.vector.manager.ui.components.ToggleRow
+import org.matrix.vector.ui.ChoiceRow
+import org.matrix.vector.ui.SheetAction
+import org.matrix.vector.ui.SheetHeading
+import org.matrix.vector.ui.StatusNote
+import org.matrix.vector.ui.ToggleRow
 import org.matrix.vector.manager.net.DohStatus
 import org.matrix.vector.manager.di.ServiceLocator
-import org.matrix.vector.manager.ui.components.ColorWheel
-import org.matrix.vector.manager.ui.components.ambience.AmbienceKind
+import org.matrix.vector.ui.ColorWheel
+import org.matrix.vector.ui.ambience.AmbienceKind
 import org.matrix.vector.manager.ui.navigation.LocalNavigator
-import org.matrix.vector.manager.ui.theme.SeedScheme
-import org.matrix.vector.manager.ui.theme.ThemeMode
+import org.matrix.vector.ui.theme.SeedScheme
+import org.matrix.vector.ui.theme.ThemeMode
 
 /**
  * How this screen looks, edited from this screen.
@@ -175,7 +175,7 @@ LocalizedOverlay {
                     FilterChip(
                         selected = AmbienceKind.from(ambience) == kind,
                         onClick = { settings.setHeaderAmbience(kind.key) },
-                        label = { Text(stringResource(kind.labelRes)) },
+                        label = { Text(stringResource(kind.labelRes())) },
                     )
                 }
             }
@@ -554,4 +554,15 @@ private fun ThemeMode.labelRes(): Int =
         ThemeMode.System -> R.string.appearance_theme_system
         ThemeMode.Light -> R.string.appearance_theme_light
         ThemeMode.Dark -> R.string.appearance_theme_dark
+    }
+
+// The ambience kind now lives in the shared UI library and carries only a key; its localized name is
+// this app's concern, mapped here.
+private fun AmbienceKind.labelRes(): Int =
+    when (this) {
+        AmbienceKind.Snow -> R.string.ambience_snow
+        AmbienceKind.Maze -> R.string.ambience_maze
+        AmbienceKind.Circuit -> R.string.ambience_circuit
+        AmbienceKind.Matrix -> R.string.ambience_matrix
+        AmbienceKind.None -> R.string.ambience_none
     }

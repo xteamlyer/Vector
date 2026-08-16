@@ -3,7 +3,6 @@
 
     <string name="nav_home">主页</string>
     <string name="nav_modules">模块</string>
-    <string name="nav_store">仓库</string>
     <string name="nav_logs">日志</string>
 
     <string name="panels_done">完成</string>
@@ -46,9 +45,6 @@
     <string name="info_not_injected">未注入</string>
     <string name="status_notification">状态通知</string>
     <string name="status_notification_summary">一条常驻通知，用于显示 Vector 正在运行。</string>
-    <string name="action_copy_all">全部复制</string>
-    <string name="copied">已复制到剪贴板</string>
-
     <string name="home_quarter_title">近期动态</string>
     <plurals name="home_commit_count">
         <item quantity="other">%1$d 次提交</item>
@@ -278,16 +274,9 @@
     <string name="update_failed_start">无法启动安装程序。</string>
     <string name="update_failed_download">无法下载此更新。</string>
     <string name="update_failed_exit">安装程序失败（退出码 %1$d）。</string>
-    <string name="store_mute_updates">忽略此模块的更新</string>
-    <string name="store_mute_updates_summary">在此处与模块列表中都不再计为过期</string>
-    <string name="store_options">选项</string>
     <string name="scope_framework_shared">所有用户共用的同一个进程，因此这会影响整台设备</string>
     <string name="scope_self_hook">此模块会被加载到自己的应用中，它正是以此报告自己已生效</string>
     <string name="update_no_output">安装程序没有任何输出。</string>
-    <string name="update_variant_release">正式版</string>
-    <string name="update_variant_debug">调试版</string>
-    <string name="update_variant_release_why">日常使用的版本</string>
-    <string name="update_variant_debug_why">带详细日志，用于反馈问题</string>
     <string name="update_versions">全部版本</string>
     <string name="update_installed">当前已装</string>
     <string name="update_older">更旧</string>
@@ -388,7 +377,6 @@
     <plurals name="crash_frames_elided">
         <item quantity="other">还有 %1$d 层调用栈，与上面相同</item>
     </plurals>
-    <string name="crash_frame_copied">已复制该层调用栈</string>
     <string name="crash_unreadable">无法读取这次崩溃。请原样复制并附在报告里。</string>
     <string name="force_launcher_icons">阻止应用隐藏自己的桌面图标</string>
     <string name="force_launcher_icons_summary">从 Android 10 起，隐藏了自己桌面图标的应用会被补上一个图标，点击它会打开该应用的应用信息页面。关闭此项可以让它继续保持隐藏——桌面可能要等重启之后才会更新。本来就没有桌面图标的应用不受影响，大多数模块都属于此类。</string>

@@ -7,7 +7,6 @@
 
     <string name="nav_home">בית</string>
     <string name="nav_modules">מודולים</string>
-    <string name="nav_store">קטלוג</string>
     <string name="nav_logs">יומנים</string>
 
     <string name="panels_done">סיום</string>
@@ -50,9 +49,6 @@
     <string name="info_not_injected">לא הוזרק</string>
     <string name="status_notification">התראת מצב</string>
     <string name="status_notification_summary">התראה קבועה שמראה ש-Vector פועל.</string>
-    <string name="action_copy_all">העתקת הכול</string>
-    <string name="copied">הועתק ללוח</string>
-
     <string name="home_quarter_title">פעילות אחרונה</string>
     <plurals name="home_commit_count">
         <item quantity="one">קומיט אחד</item>
@@ -311,16 +307,9 @@
     <string name="update_failed_start">לא ניתן היה להפעיל את תוכנית ההתקנה.</string>
     <string name="update_failed_download">לא ניתן היה להוריד את העדכון.</string>
     <string name="update_failed_exit">תוכנית ההתקנה נכשלה (קוד %1$d).</string>
-    <string name="store_mute_updates">התעלמות מעדכונים של המודול הזה</string>
-    <string name="store_mute_updates_summary">הוא יפסיק להיחשב מיושן, כאן וברשימת המודולים</string>
-    <string name="store_options">אפשרויות</string>
     <string name="scope_framework_shared">תהליך אחד שכל המשתמשים חולקים, ולכן זה משפיע על כל המכשיר</string>
     <string name="scope_self_hook">המודול הזה נטען לתוך האפליקציה של עצמו, וכך הוא מדווח שהוא פעיל</string>
     <string name="update_no_output">תוכנית ההתקנה לא הדפיסה דבר.</string>
-    <string name="update_variant_release">יציבה</string>
-    <string name="update_variant_debug">ניפוי שגיאות</string>
-    <string name="update_variant_release_why">הגרסה ליום־יום</string>
-    <string name="update_variant_debug_why">יומנים מפורטים, לדיווח על תקלה</string>
     <string name="update_versions">כל הגרסאות</string>
     <string name="update_installed">מותקנת</string>
     <string name="update_older">ישנה יותר</string>
@@ -424,7 +413,6 @@
         <item quantity="many">%1$d מסגרות נוספות, זהות לאלה שלמעלה</item>
         <item quantity="other">%1$d מסגרות נוספות, זהות לאלה שלמעלה</item>
     </plurals>
-    <string name="crash_frame_copied">המסגרת הועתקה</string>
     <string name="crash_unreadable">לא הצלחנו לקרוא את הקריסה הזאת. העתיקו אותה וצרפו אותה לדיווח כמות שהיא.</string>
     <string name="force_launcher_icons">למנוע מאפליקציות להסתיר את הסמל שלהן במסך הבית</string>
     <string name="force_launcher_icons_summary">החל מ-Android 10, אפליקציה שמסתירה את סמל מסך הבית שלה מקבלת סמל חלופי שפותח את פרטי האפליקציה שלה. כבו את האפשרות הזאת כדי לתת לה להישאר מוסתרת — ייתכן שאפליקציית מסך הבית תתעדכן רק לאחר הפעלה מחדש. אפליקציות שמעולם לא היה להן סמל במסך הבית, ובהן רוב המודולים, אינן מושפעות.</string>

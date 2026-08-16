@@ -1,6 +1,9 @@
 package org.matrix.vector.manager.ui.screens.modules
 
-import org.matrix.vector.manager.ui.components.UpdatableVersion
+import org.matrix.vector.ui.REACH_ICON_SIZE
+import org.matrix.vector.ui.UpdatableVersion
+import org.matrix.vector.ui.ModuleRow as SharedModuleRow
+import org.matrix.vector.ui.ApiBadge as SharedApiBadge
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
@@ -98,16 +101,17 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
-import org.matrix.vector.manager.data.model.ReleaseAsset
-import org.matrix.vector.manager.data.model.RepoVersion
-import org.matrix.vector.manager.data.model.StoreEntry
+import org.matrix.vector.ui.store.ReleaseAsset
+import org.matrix.vector.ui.store.RepoVersion
+import org.matrix.vector.ui.store.StoreEntry
 import org.matrix.vector.manager.data.repository.ModuleUpdateQueue
-import org.matrix.vector.manager.ui.components.SheetHeading
-import org.matrix.vector.manager.ui.components.sheetRowColors
-import org.matrix.vector.manager.ui.screens.repo.StoreChannel
-import org.matrix.vector.manager.ui.screens.repo.releasesOn
+import org.matrix.vector.ui.SheetHeading
+import org.matrix.vector.ui.sheetRowColors
+import org.matrix.vector.ui.store.StoreChannel
+import org.matrix.vector.ui.store.releasesOn
 import org.matrix.vector.ipc.IManagerService
 import org.matrix.vector.manager.R
+import org.matrix.vector.ui.R as UiR
 import org.matrix.vector.manager.data.model.InstalledModule
 import org.matrix.vector.manager.di.ServiceLocator
 import org.matrix.vector.manager.ui.components.AppIcon
@@ -116,8 +120,8 @@ import org.matrix.vector.manager.ui.components.SnackbarTone
 import org.matrix.vector.manager.ui.components.VectorSnackbarHost
 import org.matrix.vector.manager.ui.components.show
 import org.matrix.vector.manager.ui.components.PackageActionResult
-import org.matrix.vector.manager.ui.components.PanelHeader
-import org.matrix.vector.manager.ui.components.SearchField
+import org.matrix.vector.ui.PanelHeader
+import org.matrix.vector.ui.SearchField
 import org.matrix.vector.manager.ui.theme.VectorMono
 import androidx.compose.material3.Surface
 import androidx.compose.ui.platform.LocalContext
@@ -472,7 +476,7 @@ fun ModulesScreen(
             },
             dismissButton = {
                 TextButton(onClick = { confirmUninstall = false }) {
-                    Text(stringResource(R.string.logs_cancel))
+                    Text(stringResource(UiR.string.logs_cancel))
                 }
             },
         )
@@ -730,152 +734,31 @@ private fun ModuleRow(
             label = "moduleNameColor",
         )
 
-    var expanded by rememberSaveable(module.packageName) { mutableStateOf(false) }
-    var truncated by remember { mutableStateOf(false) }
-
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                // Intrinsic height so the right column can push its lower item to the bottom of
-                // whatever the description made this row.
-                .height(IntrinsicSize.Min)
-                // A module that is off recedes rather than merely changing colour: the list is
-                // read first as "what is running", and everything else should sit behind that.
-                .alpha(if (module.isEnabled || incompatible) 1f else 0.45f)
-                .padding(horizontal = 20.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        // The icon is the switch. Double-tapping it turns the module on or off without leaving the
-        // list, which is what someone flipping several modules actually wants; a single tap only
-        // says what state it is in, because a one-tap toggle here would fire every time a thumb
-        // brushed the list.
-        Column(
-            modifier = Modifier.combinedClickable(onClick = onIconClick, onLongClick = onLongClick),
-            // Against the text, not centred over the badge. The badge below is wider than the icon
-            // — "Xposed 54" is — so centring left the icon a few pixels short of the edge the
-            // names and descriptions all start from, and every row in the list showed that gap.
-            horizontalAlignment = Alignment.End,
-        ) {
-            // Fixed at the icon's own size whatever is drawn inside it, so that picking a module
-            // up cannot resize its row. A tick larger than the icon would grow this box, and with
-            // it the icon column, the row's intrinsic height and every row below — selecting one
-            // module would reflow the list under the thumb that selected it.
-            Box(modifier = Modifier.size(ICON_SIZE), contentAlignment = Alignment.Center) {
-                AppIcon(
-                    applicationInfo = module.applicationInfo,
-                    contentDescription = null,
-                    size = ICON_SIZE,
-                )
-                // The tick covers the icon rather than sitting beside it. A selected row has to be
-                // unmistakable at a glance across a screen of them, and the icon is the one part
-                // of the row the eye is already using to tell the rows apart.
-                if (selected) {
-                    Box(
-                        modifier =
-                            Modifier.fillMaxSize()
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            Icons.Rounded.Check,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(30.dp),
-                        )
-                    }
-                }
-            }
-            Spacer(Modifier.height(6.dp))
-            ApiBadge(module = module, incompatible = incompatible)
-        }
-
-        Spacer(Modifier.width(16.dp))
-
-        // Only this area opens the scope, so that a tap on the icon beside it — which is the
-        // selection handle — cannot navigate away instead.
-        //
-        // A Box, not a third column. Reserving a column for the version and the reach would take
-        // its width from *every line* of the description, the one piece of prose on this screen,
-        // and take it whether or not anything was there to put in it. They overlap the text column
-        // instead and are kept clear of the text by *vertical* placement: the version sits in the
-        // title's band, the reach in the band below the last line. Nothing is reserved
-        // horizontally, so the description runs the full width.
-        Box(
-            Modifier.weight(1f)
-                .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-        ) {
-        Column(Modifier.padding(bottom = REACH_BAND)) {
-            // The title's band. Both halves are fixed and both scroll, so neither can ever reach
-            // the other however long the module's name or its version string becomes — which is
-            // not a hypothetical: names run to "Enable Screenshot (formerly known as Disable
-            // FLAG_SECURE)" and versions to a tag with a commit hash on the end.
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = module.appName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = nameColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Clip,
-                    modifier =
-                        Modifier.weight(1f)
-                            .basicMarquee(iterations = 1, repeatDelayMillis = 3_000),
-                )
-                Spacer(Modifier.width(10.dp))
-                UpdatableVersion(
-                    text = module.versionName.ifBlank { "" },
-                    hasUpdate = hasUpdate,
-                    marquee = true,
-                    color = colors.onSurfaceVariant,
-                    // With an update in hand the version is the shortest route to the release that
-                    // would replace it, so it becomes the link. Without one it is inert: a tap
-                    // that sometimes navigates and sometimes does nothing teaches nothing.
-                    modifier =
-                        Modifier.width(VERSION_WIDTH)
-                            .then(
-                                if (!hasUpdate) Modifier
-                                else
-                                    Modifier.clip(RoundedCornerShape(6.dp)).clickable {
-                                        onOpenStore()
-                                    }
-                            ),
-                )
-            }
-            val brokenSince = facts?.apiBrokenSince
-            val loadFailure = facts?.loadFailure
-            if (loadFailure != null) {
-                // First, above every other note. A module that cannot be loaded is doing nothing
-                // at all, and unsaid that is indistinguishable from a switch that turned itself
-                // off.
-                Spacer(Modifier.height(4.dp))
+    val brokenSince = facts?.apiBrokenSince
+    val loadFailure = facts?.loadFailure
+    // A state the module is in stands in for the description: a load failure first (a module that
+    // cannot load is doing nothing, and unsaid that looks like a switch that turned itself off),
+    // then an incompatibility, then the quieter caution that the API moved underneath it.
+    val note: (@Composable () -> Unit)? =
+        if (loadFailure != null) {
+            {
                 Text(
                     text =
                         stringResource(
                             when (loadFailure) {
-                                // Named separately from "could not load it" because it is the one
-                                // refusal that is not brokenness: the module is old, and its
-                                // author is the only one who can move it forward.
                                 IManagerService.MODULE_LOAD_UNSUPPORTED_API ->
                                     R.string.modules_load_unsupported_api
-                                IManagerService.MODULE_LOAD_NO_APK ->
-                                    R.string.modules_load_no_apk
-                                IManagerService.MODULE_LOAD_UNUSABLE ->
-                                    R.string.modules_load_unusable
-                                // Every other reason, including one this build does not know:
-                                // `ModuleLoadFailure.reason` is never 0, so an unrecognised value
-                                // is a reason a newer daemon has and this manager has not. Saying
-                                // the module could not be loaded is the whole of what is
-                                // established; naming the nearest reason we do know would be a
-                                // guess.
+                                IManagerService.MODULE_LOAD_NO_APK -> R.string.modules_load_no_apk
+                                IManagerService.MODULE_LOAD_UNUSABLE -> R.string.modules_load_unusable
                                 else -> R.string.modules_load_unusable
                             }
                         ),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.error,
                 )
-            } else if (incompatible) {
-                Spacer(Modifier.height(4.dp))
+            }
+        } else if (incompatible) {
+            {
                 Text(
                     text =
                         stringResource(
@@ -886,147 +769,70 @@ private fun ModuleRow(
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.error,
                 )
-            } else if (brokenSince != null) {
-                // Not an error: the framework will load this and it may work perfectly. It is a
-                // caution, in the caution colour, naming the version that changed underneath it so
-                // the reader can go and ask its author about that specific thing.
-                Spacer(Modifier.height(4.dp))
+            }
+        } else if (brokenSince != null) {
+            {
                 Text(
-                    text =
-                        stringResource(
-                            R.string.modules_api_behind,
-                            // "Built for" is the target, and it is what decided this caution was
-                            // due; showing the floor beside a verdict reached from the target
-                            // would be two numbers disagreeing in one sentence.
-                            module.apiVersion,
-                            brokenSince,
-                        ),
+                    text = stringResource(R.string.modules_api_behind, module.apiVersion, brokenSince),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.tertiary,
                 )
-            } else if (module.description.isNotBlank()) {
-                Spacer(Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        // The only prose on this screen, and the thing that says what the module
-                        // actually does — so it gets room.
-                        text = module.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.onSurfaceVariant,
-                        maxLines = if (expanded) Int.MAX_VALUE else 3,
-                        overflow = TextOverflow.Ellipsis,
-                        // Whether there is more to read is a property of this description at this
-                        // width, which only the layout knows — so the control appears only when
-                        // it would do something.
-                        onTextLayout = { truncated = it.hasVisualOverflow || expanded },
-                        modifier = Modifier.weight(1f, fill = false),
-                    )
-                    if (truncated) {
-                        Icon(
-                            imageVector =
-                                if (expanded) Icons.Rounded.ExpandLess
-                                else Icons.Rounded.ExpandMore,
-                            contentDescription =
-                                stringResource(
-                                    if (expanded) R.string.modules_collapse
-                                    else R.string.modules_expand
-                                ),
-                            tint = colors.primary,
-                            modifier =
-                                Modifier.padding(start = 4.dp)
-                                    .size(20.dp)
-                                    .clip(CircleShape)
-                                    .clickable { expanded = !expanded },
-                        )
-                    }
-                }
             }
-        }
+        } else null
 
-            // The reach, in the band the row already left empty under the last line of text. It
-            // is allowed to run left past where a column would have ended — nothing is there — so
-            // it costs the description no width at all.
-            ScopePreview(
-                module = module,
-                facts = facts,
-                modifier = Modifier.align(Alignment.BottomEnd),
+    // Who this module touches, handed to the row as data — the row itself draws it bottom-right. The
+    // framework is a scope target with no launcher icon, so it rides in as the leading mark rather
+    // than becoming part of a number; an empty, framework-less scope passes nothing and the row
+    // reserves no band.
+    val scopePreview = facts?.scopePreview.orEmpty()
+    SharedModuleRow(
+        icon = {
+            AppIcon(
+                applicationInfo = module.applicationInfo,
+                contentDescription = null,
+                size = ICON_SIZE,
             )
-        }
-    }
+        },
+        name = module.appName,
+        versionName = module.versionName,
+        description = module.description,
+        apiBadge = { ApiBadge(module = module, incompatible = incompatible) },
+        nameColor = nameColor,
+        hasUpdate = hasUpdate,
+        onVersionClick = if (hasUpdate) onOpenStore else null,
+        dimmed = !module.isEnabled && !incompatible,
+        selected = selected,
+        onIconClick = onIconClick,
+        onIconLongClick = onLongClick,
+        onClick = onClick,
+        onLongClick = onLongClick,
+        note = note,
+        reachLeading =
+            if (facts?.scopeFramework == true) {
+                {
+                    Icon(
+                        Icons.Rounded.Android,
+                        contentDescription = stringResource(R.string.modules_scope_framework),
+                        tint = colors.primary,
+                        modifier = Modifier.size(REACH_ICON_SIZE),
+                    )
+                }
+            } else null,
+        reachIcons =
+            scopePreview.map { info ->
+                { AppIcon(applicationInfo = info, contentDescription = null, size = REACH_ICON_SIZE) }
+            },
+        reachCount = (facts?.scopeCount ?: 0).coerceAtLeast(0),
+    )
 }
 
 /**
- * The strip along the bottom of a row that the reach sits in.
- *
- * The row already ended in a gap of about this size, so the icons landed in space that was being
- * left empty anyway: full-width prose and a right-aligned reach, for a few density-independent
- * pixels rather than a whole column.
- */
-private val REACH_BAND = 22.dp
-
-/** Room for a version and its mark. Anything longer scrolls past instead of pushing. */
-private val VERSION_WIDTH = 104.dp
-
-/**
- * The module's icon, and the slot it is drawn in whether or not it is selected.
+ * The size the module's icon is drawn at, matching the shared row's own icon slot.
  *
  * Comfortably a touch target — it is the selection handle — while leaving the width a larger icon
  * would take to the column that holds the name and the description, where the reading happens.
  */
 private val ICON_SIZE = 48.dp
-
-/**
- * Who the module actually touches.
- *
- * A count alone answers a question nobody asked; three recognisable icons answer "does this touch
- * anything I care about" without opening anything, and the remainder collapses to a number after
- * them. Nothing is drawn at all when the scope is empty or not yet known.
- */
-@Composable
-private fun ScopePreview(
-    module: InstalledModule,
-    facts: ModuleFacts?,
-    modifier: Modifier = Modifier,
-) {
-    val colors = MaterialTheme.colorScheme
-    val reach = facts?.scopeCount ?: -1
-    val framework = facts?.scopeFramework == true
-    // Nothing to depict, so nothing is drawn. A row saying "no apps" would spend a line on an
-    // absence, and would say it of every module that hooks only the framework.
-    if (reach <= 0 && !framework) return
-
-    val preview = facts?.scopePreview.orEmpty()
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        if (framework) {
-            // The framework is a scope target with no icon, so it gets a mark of its own rather
-            // than silently becoming part of a number.
-            Icon(
-                Icons.Rounded.Android,
-                contentDescription = stringResource(R.string.modules_scope_framework),
-                tint = colors.primary,
-                modifier = Modifier.padding(start = 3.dp).size(20.dp),
-            )
-        }
-        preview.forEach { info ->
-            AppIcon(
-                applicationInfo = info,
-                contentDescription = null,
-                size = 20.dp,
-                modifier = Modifier.padding(start = 3.dp),
-            )
-        }
-        val remainder = reach - preview.size
-        if (remainder > 0) {
-            Spacer(Modifier.width(5.dp))
-            Text(
-                text = stringResource(R.string.modules_scope_more, remainder),
-                style = MaterialTheme.typography.labelMedium,
-                color = colors.onSurfaceVariant,
-                maxLines = 1,
-            )
-        }
-    }
-}
 
 /**
  * `API 101` / `Xposed 93`, with the scale small and quiet and the number carrying the colour.
@@ -1037,28 +843,18 @@ private fun ScopePreview(
  */
 @Composable
 private fun ApiBadge(module: InstalledModule, incompatible: Boolean) {
-    val colors = MaterialTheme.colorScheme
     val undeclared = !module.declaresApiVersion
-
-    Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-        Text(
-            text =
-                stringResource(
-                    if (module.isLegacy) R.string.modules_api_scale_legacy
-                    else R.string.modules_api_scale_modern
-                ),
-            // Barely there: the scale is context, and it repeats down every row. The number is
-            // the only part anyone reads twice.
-            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
-            color = colors.onSurfaceVariant.copy(alpha = 0.7f),
-        )
-        Text(
-            text = if (undeclared) "?" else module.apiVersion.toString(),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = if (incompatible || undeclared) colors.error else colors.primary,
-        )
-    }
+    // Map the module's declared API onto the shared badge: an undeclared value shows "?" and takes
+    // the error treatment, the same as an incompatible one.
+    SharedApiBadge(
+        label =
+            stringResource(
+                if (module.isLegacy) R.string.modules_api_scale_legacy
+                else R.string.modules_api_scale_modern
+            ),
+        value = if (undeclared) "?" else module.apiVersion.toString(),
+        incompatible = incompatible || undeclared,
+    )
 }
 
 @Composable

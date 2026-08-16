@@ -1,0 +1,19 @@
+package org.matrix.vector.ui.locale
+
+import kotlinx.coroutines.flow.StateFlow
+
+/**
+ * The chosen in-app language and the languages on offer, so the shared locale plumbing and the
+ * [LanguageSheet] do not reach into either app's settings.
+ *
+ * [appLocale] is a BCP-47 tag, empty meaning "follow the system". [availableTags] is the set of
+ * languages the host is actually translated into — hard-listed by each app from its own resource
+ * folders rather than guessed from `AssetManager`, which reports every locale a dependency ships.
+ */
+interface LocaleController {
+    val appLocale: StateFlow<String>
+
+    val availableTags: List<String>
+
+    fun setAppLocale(tag: String)
+}

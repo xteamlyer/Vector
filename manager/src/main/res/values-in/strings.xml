@@ -7,7 +7,6 @@
 
     <string name="nav_home">Beranda</string>
     <string name="nav_modules">Modul</string>
-    <string name="nav_store">Katalog</string>
     <string name="nav_logs">Log</string>
 
     <string name="panels_done">Selesai</string>
@@ -50,9 +49,6 @@
     <string name="info_not_injected">Tidak terinjeksi</string>
     <string name="status_notification">Notifikasi status</string>
     <string name="status_notification_summary">Notifikasi permanen yang menandakan Vector sedang berjalan.</string>
-    <string name="action_copy_all">Salin semua</string>
-    <string name="copied">Disalin ke papan klip</string>
-
     <string name="home_quarter_title">Aktivitas terbaru</string>
     <plurals name="home_commit_count">
         <item quantity="other">%1$d commit</item>
@@ -281,16 +277,9 @@
     <string name="update_failed_start">Pemasang tidak bisa dijalankan.</string>
     <string name="update_failed_download">Pembaruan tidak bisa diunduh.</string>
     <string name="update_failed_exit">Pemasang gagal (kode %1$d).</string>
-    <string name="store_mute_updates">Abaikan pembaruan untuk modul ini</string>
-    <string name="store_mute_updates_summary">Ia berhenti dihitung usang, di sini maupun di daftar modul</string>
-    <string name="store_options">Opsi</string>
     <string name="scope_framework_shared">Satu proses yang dipakai bersama semua pengguna, jadi ini memengaruhi seluruh perangkat</string>
     <string name="scope_self_hook">Modul ini dimuat ke dalam aplikasinya sendiri, begitulah cara ia melaporkan bahwa dirinya aktif</string>
     <string name="update_no_output">Pemasang tidak mengeluarkan apa pun.</string>
-    <string name="update_variant_release">Rilis</string>
-    <string name="update_variant_debug">Debug</string>
-    <string name="update_variant_release_why">Build untuk sehari-hari</string>
-    <string name="update_variant_debug_why">Log rinci, untuk laporan bug</string>
     <string name="update_versions">Semua versi</string>
     <string name="update_installed">Terpasang</string>
     <string name="update_older">Lebih lama</string>
@@ -391,7 +380,6 @@
     <plurals name="crash_frames_elided">
         <item quantity="other">%1$d bingkai lagi, sama seperti di atas</item>
     </plurals>
-    <string name="crash_frame_copied">Bingkai disalin</string>
     <string name="crash_unreadable">Crash ini tidak terbaca. Salin dan lampirkan apa adanya ke laporan.</string>
     <string name="force_launcher_icons">Cegah aplikasi menyembunyikan ikon launcher-nya</string>
     <string name="force_launcher_icons_summary">Sejak Android 10, aplikasi yang menyembunyikan ikon launcher-nya sendiri diberi ikon pengganti yang membuka halaman info aplikasinya. Matikan ini agar aplikasi tersebut tetap tersembunyi — launcher Anda mungkin baru menyusul setelah dimulai ulang. Aplikasi yang memang tidak pernah punya ikon launcher, termasuk sebagian besar modul, tidak terpengaruh.</string>

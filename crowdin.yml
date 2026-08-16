@@ -32,12 +32,35 @@ files:
         'zh-CN': 'zh-rCN'
         'zh-HK': 'zh-rHK'
         'zh-TW': 'zh-rTW'
-  - source: /manager/src/main/res/values/strings_logs.xml
-    translation: /manager/src/main/res/values-%two_letters_code%/%original_file_name%
+  # The shared manager UI library (manager-ui) owns the strings once split across the manager app;
+  # they were lifted here when the UI was modularised so both the Vector manager and downstream
+  # consumers (LSPatch) render the same, already-translated components.
+  - source: /manager-ui/src/main/res/values/strings_appearance.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
     type: android
     languages_mapping: *resource_folders
-  - source: /manager/src/main/res/values/strings_store.xml
-    translation: /manager/src/main/res/values-%two_letters_code%/%original_file_name%
+  - source: /manager-ui/src/main/res/values/strings_language.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
+    type: android
+    languages_mapping: *resource_folders
+  - source: /manager-ui/src/main/res/values/strings_logs.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
+    type: android
+    languages_mapping: *resource_folders
+  - source: /manager-ui/src/main/res/values/strings_modules.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
+    type: android
+    languages_mapping: *resource_folders
+  - source: /manager-ui/src/main/res/values/strings_nav.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
+    type: android
+    languages_mapping: *resource_folders
+  - source: /manager-ui/src/main/res/values/strings_store.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
+    type: android
+    languages_mapping: *resource_folders
+  - source: /manager-ui/src/main/res/values/strings_trace.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
     type: android
     languages_mapping: *resource_folders
   - source: /daemon/src/main/res/values/strings.xml

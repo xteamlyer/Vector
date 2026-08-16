@@ -3,7 +3,6 @@
 
     <string name="nav_home">خانه</string>
     <string name="nav_modules">ماژول‌ها</string>
-    <string name="nav_store">فهرست</string>
     <string name="nav_logs">گزارش‌ها</string>
 
     <string name="panels_done">انجام شد</string>
@@ -46,9 +45,6 @@
     <string name="info_not_injected">تزریق‌نشده</string>
     <string name="status_notification">اعلان وضعیت</string>
     <string name="status_notification_summary">اعلانی ماندگار که نشان می‌دهد Vector در حال اجراست.</string>
-    <string name="action_copy_all">رونوشت همه</string>
-    <string name="copied">در بریده‌دان رونوشت شد</string>
-
     <string name="home_quarter_title">فعالیت اخیر</string>
     <plurals name="home_commit_count">
         <item quantity="one">%1$d کامیت</item>
@@ -287,16 +283,9 @@
     <string name="update_failed_start">نصب‌کننده اجرا نشد.</string>
     <string name="update_failed_download">به‌روزرسانی بارگیری نشد.</string>
     <string name="update_failed_exit">نصب‌کننده شکست خورد (کد %1$d).</string>
-    <string name="store_mute_updates">نادیده گرفتن به‌روزرسانی‌های این ماژول</string>
-    <string name="store_mute_updates_summary">دیگر نه اینجا و نه در فهرست ماژول‌ها قدیمی شمرده نمی‌شود</string>
-    <string name="store_options">گزینه‌ها</string>
     <string name="scope_framework_shared">یک فرایند که همهٔ کاربران در آن شریک‌اند، پس این کل دستگاه را تحت تأثیر می‌گذارد</string>
     <string name="scope_self_hook">این ماژول در برنامهٔ خودش بارگذاری می‌شود و به همین شکل فعال‌بودنش را گزارش می‌کند</string>
     <string name="update_no_output">نصب‌کننده چیزی چاپ نکرد.</string>
-    <string name="update_variant_release">نهایی</string>
-    <string name="update_variant_debug">اشکال‌زدایی</string>
-    <string name="update_variant_release_why">ساخت روزمره</string>
-    <string name="update_variant_debug_why">گزارش‌های پرگو، برای گزارش اشکال</string>
     <string name="update_versions">همهٔ نسخه‌ها</string>
     <string name="update_installed">نصب‌شده</string>
     <string name="update_older">قدیمی‌تر</string>
@@ -398,7 +387,6 @@
         <item quantity="one">%1$d قاب دیگر، مانند بالا</item>
         <item quantity="other">%1$d قاب دیگر، مانند بالا</item>
     </plurals>
-    <string name="crash_frame_copied">قاب رونوشت شد</string>
     <string name="crash_unreadable">این خرابی خوانده نشد. آن را همان‌گونه که هست رونوشت کنید و به گزارش پیوست کنید.</string>
     <string name="force_launcher_icons">جلوگیری از پنهان کردن نماد برنامه‌ها در لانچر</string>
     <string name="force_launcher_icons_summary">از Android 10 به بعد، برنامه‌ای که نماد خود را در لانچر پنهان می‌کند، نمادی جایگزین می‌گیرد که صفحهٔ اطلاعات برنامه را باز می‌کند. این را خاموش کنید تا پنهان بماند — شاید لانچر شما تا راه‌اندازی دوبارهٔ خودش به‌روز نشود. برنامه‌هایی که هرگز نماد لانچر نداشته‌اند، از جمله بیشتر ماژول‌ها، تحت تأثیر قرار نمی‌گیرند.</string>

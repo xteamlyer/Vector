@@ -16,9 +16,10 @@ import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.matrix.vector.manager.data.model.OnlineModule
-import org.matrix.vector.manager.data.model.RepoVersion
-import org.matrix.vector.manager.data.model.StoreCatalog
+import org.matrix.vector.ui.store.StoreDataSource
+import org.matrix.vector.ui.store.OnlineModule
+import org.matrix.vector.ui.store.RepoVersion
+import org.matrix.vector.ui.store.StoreCatalog
 import org.matrix.vector.manager.data.model.versionCodeCompat
 import org.matrix.vector.manager.di.ServiceLocator
 import org.matrix.vector.manager.ipc.DaemonClient
@@ -50,13 +51,13 @@ class RepoRepository(
     private val daemon: DaemonClient,
     private val scope: CoroutineScope,
     private val gson: Gson = Gson(),
-) {
+) : StoreDataSource {
 
     private val _catalog = MutableStateFlow(StoreCatalog())
-    val catalog: StateFlow<StoreCatalog> = _catalog.asStateFlow()
+    override val catalog: StateFlow<StoreCatalog> = _catalog.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    override val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private val _installed = MutableStateFlow<Map<String, RepoVersion>>(emptyMap())
 
@@ -67,7 +68,7 @@ class RepoRepository(
      * that every name it asks about is a module, so it does not need the much more expensive
      * discovery the Modules screen runs, which opens every APK to find out.
      */
-    val installedVersions: StateFlow<Map<String, RepoVersion>> = _installed.asStateFlow()
+    override val installedVersions: StateFlow<Map<String, RepoVersion>> = _installed.asStateFlow()
 
 
     /** Held for the length of a refresh; `tryLock` leaves no window between checking and taking. */
@@ -89,7 +90,7 @@ class RepoRepository(
      * [force] is pull-to-refresh: it bypasses the cache rather than revalidating against it,
      * because a user who pulls is telling us they think what they are looking at is stale.
      */
-    suspend fun refresh(force: Boolean = false) {
+    override suspend fun refresh(force: Boolean) {
         // A second caller during a refresh is a no-op rather than a queued duplicate of a 1.2 MB
         // download.
         if (!refreshing.tryLock()) return
@@ -138,7 +139,7 @@ class RepoRepository(
      * they already hold, which carries the description, the scope, the collaborators and the newest
      * release with its APK — a usable page, and much better than an error screen.
      */
-    suspend fun details(packageName: String): OnlineModule? =
+    override suspend fun details(packageName: String): OnlineModule? =
         withContext(Dispatchers.IO) {
             val freshness =
                 CacheControl.Builder().maxAge(DETAIL_MAX_AGE_MINUTES, TimeUnit.MINUTES).build()
@@ -149,7 +150,7 @@ class RepoRepository(
         }
 
     /** Re-reads installed versions; called on opening the Store and after an install lands. */
-    fun refreshInstalled() {
+    override fun refreshInstalled() {
         scope.launch { loadInstalled() }
     }
 

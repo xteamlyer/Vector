@@ -3,7 +3,6 @@
 
     <string name="nav_home">Головна</string>
     <string name="nav_modules">Модулі</string>
-    <string name="nav_store">Каталог</string>
     <string name="nav_logs">Журнали</string>
 
     <string name="panels_done">Готово</string>
@@ -46,9 +45,6 @@
     <string name="info_not_injected">Не впроваджено</string>
     <string name="status_notification">Сповіщення про стан</string>
     <string name="status_notification_summary">Постійне сповіщення, яке показує, що Vector працює.</string>
-    <string name="action_copy_all">Копіювати все</string>
-    <string name="copied">Скопійовано в буфер обміну</string>
-
     <string name="home_quarter_title">Нещодавня активність</string>
     <plurals name="home_commit_count">
         <item quantity="one">%1$d коміт</item>
@@ -307,16 +303,9 @@
     <string name="update_failed_start">Не вдалося запустити встановлювач.</string>
     <string name="update_failed_download">Не вдалося завантажити оновлення.</string>
     <string name="update_failed_exit">Встановлювач завершився помилкою (код %1$d).</string>
-    <string name="store_mute_updates">Ігнорувати оновлення цього модуля</string>
-    <string name="store_mute_updates_summary">Він перестане рахуватися застарілим — і тут, і в переліку модулів</string>
-    <string name="store_options">Параметри</string>
     <string name="scope_framework_shared">Один процес, спільний для всіх користувачів, тож це стосується всього пристрою</string>
     <string name="scope_self_hook">Цей модуль завантажується у власний застосунок — так він і повідомляє, що активний</string>
     <string name="update_no_output">Встановлювач нічого не вивів.</string>
-    <string name="update_variant_release">Стабільна</string>
-    <string name="update_variant_debug">Зневаджувальна</string>
-    <string name="update_variant_release_why">Збірка на щодень</string>
-    <string name="update_variant_debug_why">Докладні журнали, для звіту про помилку</string>
     <string name="update_versions">Усі версії</string>
     <string name="update_installed">Встановлена</string>
     <string name="update_older">Старіша</string>
@@ -350,14 +339,20 @@
     <string name="modules_update_selected">Оновити %1$d</string>
     <plurals name="modules_updates">
         <item quantity="one">%1$d модуль можна оновити</item>
+        <item quantity="few">%1$d модулів можна оновити</item>
+        <item quantity="many">%1$d модулів можна оновити</item>
         <item quantity="other">%1$d модулів можна оновити</item>
     </plurals>
     <plurals name="modules_updated">
         <item quantity="one">Оновлено %1$d модуль</item>
+        <item quantity="few">Оновлено %1$d модулів</item>
+        <item quantity="many">Оновлено %1$d модулів</item>
         <item quantity="other">Оновлено %1$d модулів</item>
     </plurals>
     <plurals name="modules_update_failed">
         <item quantity="one">Не вдалося оновити %1$d модуль</item>
+        <item quantity="few">Не вдалося оновити %1$d модулів</item>
+        <item quantity="many">Не вдалося оновити %1$d модулів</item>
         <item quantity="other">Не вдалося оновити %1$d модулів</item>
     </plurals>
     <string name="home_window_changed">Показано збережену активність за новий період — потягніть, щоб оновити</string>
@@ -367,30 +362,44 @@
     <string name="modules_load_unusable">Увімкнено, але фреймворк не зміг його завантажити. Він не працює.</string>
     <plurals name="modules_batch_enabled">
         <item quantity="one">Увімкнено %1$d модуль</item>
+        <item quantity="few">Увімкнено модулів: %1$d</item>
+        <item quantity="many">Увімкнено модулів: %1$d</item>
         <item quantity="other">Увімкнено модулів: %1$d</item>
     </plurals>
     <plurals name="modules_batch_disabled">
         <item quantity="one">Вимкнено %1$d модуль</item>
+        <item quantity="few">Вимкнено модулів: %1$d</item>
+        <item quantity="many">Вимкнено модулів: %1$d</item>
         <item quantity="other">Вимкнено модулів: %1$d</item>
     </plurals>
     <plurals name="modules_batch_uninstalled">
         <item quantity="one">Видалено %1$d модуль</item>
+        <item quantity="few">Видалено модулів: %1$d</item>
+        <item quantity="many">Видалено модулів: %1$d</item>
         <item quantity="other">Видалено модулів: %1$d</item>
     </plurals>
     <plurals name="modules_batch_already_on">
         <item quantity="one">%1$d уже був увімкнений</item>
+        <item quantity="few">Уже були увімкнені: %1$d</item>
+        <item quantity="many">Уже були увімкнені: %1$d</item>
         <item quantity="other">Уже були увімкнені: %1$d</item>
     </plurals>
     <plurals name="modules_batch_already_off">
         <item quantity="one">%1$d уже був вимкнений</item>
+        <item quantity="few">Уже були вимкнені: %1$d</item>
+        <item quantity="many">Уже були вимкнені: %1$d</item>
         <item quantity="other">Уже були вимкнені: %1$d</item>
     </plurals>
     <plurals name="modules_batch_all_already_on">
         <item quantity="one">Він уже був увімкнений</item>
+        <item quantity="few">Усі %1$d уже були увімкнені</item>
+        <item quantity="many">Усі %1$d уже були увімкнені</item>
         <item quantity="other">Усі %1$d уже були увімкнені</item>
     </plurals>
     <plurals name="modules_batch_all_already_off">
         <item quantity="one">Він уже був вимкнений</item>
+        <item quantity="few">Усі %1$d уже були вимкнені</item>
+        <item quantity="many">Усі %1$d уже були вимкнені</item>
         <item quantity="other">Усі %1$d уже були вимкнені</item>
     </plurals>
     <string name="info_manager_version">Менеджер</string>
@@ -420,7 +429,6 @@
         <item quantity="many">ще %1$d кадрів, таких самих, як вище</item>
         <item quantity="other">ще %1$d кадра, такі самі, як вище</item>
     </plurals>
-    <string name="crash_frame_copied">Кадр скопійовано</string>
     <string name="crash_unreadable">Цей збій не вдалося прочитати. Скопіюйте його та додайте до звіту як є.</string>
     <string name="force_launcher_icons">Не дозволяти застосункам ховати свій значок у лаунчері</string>
     <string name="force_launcher_icons_summary">Починаючи з Android 10, застосунок, який ховає свій значок у лаунчері, отримує його назад, і цей значок відкриває сторінку відомостей про застосунок. Вимкніть це, щоб значок лишався прихованим — лаунчер може оновити свій перелік лише після перезапуску. Застосунків, які ніколи не мали значка в лаунчері, зокрема більшість модулів, це не стосується.</string>

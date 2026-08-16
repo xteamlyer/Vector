@@ -80,7 +80,7 @@ private object PackageContextHelper {
 }
 
 /** Identity-based tracking for LoadedApk instances. */
-private object LoadedApkTracker {
+internal object LoadedApkTracker {
     // Tracks LoadedApk instances that are currently in their initial bootstrap phase
     val activeApks: MutableSet<Any> =
         Collections.synchronizedSet(Collections.newSetFromMap(WeakHashMap()))

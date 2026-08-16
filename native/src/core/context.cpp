@@ -28,7 +28,7 @@ Context::PreloadedDex::PreloadedDex(int fd, size_t size) {
 }
 
 Context::PreloadedDex::~PreloadedDex() {
-    if (addr_ && size_ > 0) {
+    if (addr_ && size_ > 0 && owned_) {
         munmap(addr_, size_);
     }
 }

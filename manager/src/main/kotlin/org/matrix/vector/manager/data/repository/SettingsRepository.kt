@@ -6,8 +6,9 @@ import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.matrix.vector.manager.data.model.RepoVersion
-import org.matrix.vector.manager.data.model.StoreInstall
+import org.matrix.vector.ui.store.RepoVersion
+import org.matrix.vector.ui.store.StoreInstall
+import org.matrix.vector.ui.store.StoreSettings
 
 /**
  * The manager's own preferences: how it looks, what it shows, and what it has been told to stop
@@ -18,7 +19,7 @@ import org.matrix.vector.manager.data.model.StoreInstall
  * which parasitically happens far more often than a user would expect since the host is
  * `com.android.shell`.
  */
-class SettingsRepository(context: Context) {
+class SettingsRepository(context: Context) : StoreSettings {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("vector_settings", Context.MODE_PRIVATE)
 
@@ -56,7 +57,7 @@ class SettingsRepository(context: Context) {
      */
     private val _updateChannel =
         MutableStateFlow(prefs.getString("update_channel", "stable") ?: "stable")
-    val updateChannel: StateFlow<String> = _updateChannel.asStateFlow()
+    override val updateChannel: StateFlow<String> = _updateChannel.asStateFlow()
 
     /**
      * Resolve through Cloudflare rather than the network's own resolver.
@@ -188,9 +189,9 @@ class SettingsRepository(context: Context) {
      */
     private val _mutedUpdates =
         MutableStateFlow(prefs.getStringSet("muted_updates", emptySet())?.toSet() ?: emptySet())
-    val mutedUpdates: StateFlow<Set<String>> = _mutedUpdates.asStateFlow()
+    override val mutedUpdates: StateFlow<Set<String>> = _mutedUpdates.asStateFlow()
 
-    fun setUpdatesMuted(packageName: String, muted: Boolean) {
+    override fun setUpdatesMuted(packageName: String, muted: Boolean) {
         val next =
             if (muted) _mutedUpdates.value + packageName else _mutedUpdates.value - packageName
         // A set of our own on the way in, and `toSet()` on the way out above: `getStringSet` hands
@@ -218,7 +219,7 @@ class SettingsRepository(context: Context) {
      * version.
      */
     private val _storeInstalls = MutableStateFlow(readStoreInstalls())
-    val storeInstalls: StateFlow<Map<String, StoreInstall>> = _storeInstalls.asStateFlow()
+    override val storeInstalls: StateFlow<Map<String, StoreInstall>> = _storeInstalls.asStateFlow()
 
     /** Records what the Store installed for [packageName], replacing any earlier note of it. */
     fun noteStoreInstall(packageName: String, install: StoreInstall) {
@@ -507,7 +508,7 @@ class SettingsRepository(context: Context) {
         _amoledBlack.value = enabled
     }
 
-    fun setUpdateChannel(channel: String) {
+    override fun setUpdateChannel(channel: String) {
         prefs.edit().putString("update_channel", channel).apply()
         _updateChannel.value = channel
     }

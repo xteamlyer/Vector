@@ -19,10 +19,11 @@ import kotlinx.coroutines.withContext
 import org.matrix.vector.ipc.DeviceUser
 import org.matrix.vector.ipc.ScopeEntry
 import org.matrix.vector.manager.data.model.InstalledModule
-import org.matrix.vector.manager.data.model.MATCH_ANY_USER
-import org.matrix.vector.manager.data.model.PER_USER_RANGE
+import org.matrix.vector.ui.REACH_PREVIEW_LIMIT
+import org.matrix.vector.ui.module.MATCH_ANY_USER
+import org.matrix.vector.ui.module.PER_USER_RANGE
 import org.matrix.vector.manager.data.repository.ModuleRepository
-import org.matrix.vector.manager.data.model.StoreEntry
+import org.matrix.vector.ui.store.StoreEntry
 import org.matrix.vector.manager.data.repository.ModuleUpdateQueue
 import org.matrix.vector.manager.data.model.XposedApi
 import org.matrix.vector.manager.data.model.versionCodeCompat
@@ -93,9 +94,6 @@ enum class ModuleSort {
     RecentlyUpdated,
     WidestScope,
 }
-
-/** How many scoped apps a row previews before collapsing the rest into a count. */
-const val SCOPE_PREVIEW_LIMIT = 3
 
 /** The framework itself, which the daemon names in a scope like any package but which is not one. */
 private const val SYSTEM_FRAMEWORK = "system"
@@ -239,7 +237,7 @@ class ModulesViewModel(
         // asks for it rather than relying on the splash prefetch having succeeded. Cheap to
         // repeat: the request is cache-controlled and a concurrent caller returns immediately
         // rather than starting a second 1.2 MB download.
-        ServiceLocator.appScope.launch { runCatching { ServiceLocator.store.refresh() } }
+        ServiceLocator.appScope.launch { runCatching { ServiceLocator.store.refresh(false) } }
         viewModelScope.launch {
             // drop(1): the current value is the state we just rendered, not a change.
             moduleRepository.scopeRevision.drop(1).collect { loadFacts(_discovered.value) }
@@ -466,7 +464,7 @@ class ModulesViewModel(
                             apps
                                 .asSequence()
                                 .mapNotNull { byPackage[it.packageName to it.userId]?.applicationInfo }
-                                .take(SCOPE_PREVIEW_LIMIT)
+                                .take(REACH_PREVIEW_LIMIT)
                                 .toList(),
                     )
             }

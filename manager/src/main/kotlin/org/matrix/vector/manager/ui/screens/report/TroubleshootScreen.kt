@@ -48,6 +48,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.matrix.vector.manager.R
+import org.matrix.vector.ui.R as UiR
 import org.matrix.vector.manager.data.github.GitHubRepository
 import org.matrix.vector.manager.data.log.logArchiveName
 import org.matrix.vector.manager.di.ServiceLocator
@@ -83,8 +84,8 @@ fun TroubleshootScreen(
     val snackbars = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val savedLabel = stringResource(R.string.logs_saved)
-    val failedLabel = stringResource(R.string.logs_save_failed)
+    val savedLabel = stringResource(UiR.string.logs_saved)
+    val failedLabel = stringResource(UiR.string.logs_save_failed)
 
     val saveLauncher =
         rememberLauncherForActivityResult(
@@ -192,7 +193,7 @@ fun TroubleshootScreen(
                             modifier = Modifier.size(18.dp),
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.logs_save))
+                        Text(stringResource(UiR.string.logs_save))
                     }
                 }
             }

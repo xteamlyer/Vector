@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.matrix.vector.ipc.ScopeEntry
 import org.matrix.vector.manager.data.model.AppInfo
-import org.matrix.vector.manager.data.model.ModuleDetection
-import org.matrix.vector.manager.data.model.RecommendedScope
+import org.matrix.vector.ui.module.ModuleDetection
+import org.matrix.vector.ui.module.RecommendedScope
 import org.matrix.vector.manager.data.repository.AppRepository
 import org.matrix.vector.manager.data.repository.ModuleRepository
 import org.matrix.vector.manager.di.ServiceLocator

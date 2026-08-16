@@ -25,11 +25,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.matrix.vector.manager.R
+import org.matrix.vector.ui.R as UiR
 import org.matrix.vector.manager.data.log.CrashRecorder
 import org.matrix.vector.manager.data.log.CrashReport
 import org.matrix.vector.manager.ui.components.SnackbarTone
-import org.matrix.vector.manager.ui.components.StackTrace
-import org.matrix.vector.manager.ui.components.stackTraceItems
+import org.matrix.vector.ui.logs.StackTrace
+import org.matrix.vector.ui.logs.stackTraceItems
 import org.matrix.vector.manager.ui.components.VectorSnackbarHost
 import org.matrix.vector.manager.ui.components.copyToClipboard
 import org.matrix.vector.manager.ui.components.show
@@ -50,8 +51,8 @@ fun CrashTraceScreen(onNavigateBack: () -> Unit) {
     val report = remember { CrashRecorder.newest(context) }
     val snackbars = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val copied = stringResource(R.string.copied)
-    val frameCopied = stringResource(R.string.crash_frame_copied)
+    val copied = stringResource(UiR.string.copied)
+    val frameCopied = stringResource(UiR.string.crash_frame_copied)
 
     Scaffold(
         snackbarHost = { VectorSnackbarHost(snackbars) },
@@ -80,7 +81,7 @@ fun CrashTraceScreen(onNavigateBack: () -> Unit) {
                     ) {
                         Icon(
                             Icons.Rounded.ContentCopy,
-                            contentDescription = stringResource(R.string.action_copy_all),
+                            contentDescription = stringResource(UiR.string.action_copy_all),
                         )
                     }
                 },

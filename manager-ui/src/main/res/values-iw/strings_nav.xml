@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_home">בית</string>
+    <string name="nav_modules">מודולים</string>
+    <string name="nav_logs">יומנים</string>
+    <string name="nav_manage">ניהול</string>
+    <string name="panels_ball_close">סגירת הניווט</string>
+    <string name="panels_ball_open">פתיחת הניווט</string>
+    <string name="panels_done">סיום</string>
+    <string name="panels_hide">הסתרת %1$s</string>
+    <string name="panels_move_earlier">העברה קדימה</string>
+    <string name="panels_move_later">העברה אחורה</string>
+    <string name="panels_show">הצגת %1$s</string>
+    <string name="settings_rearrange_panels">סידור המקטעים מחדש</string>
+</resources>

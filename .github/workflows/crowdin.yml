@@ -9,8 +9,13 @@ on:
       # CLI's are defined independently — notably on whether `*` may match nothing — and a
       # trigger that quietly never fires is the worse failure.
       - manager/src/main/res/values/strings.xml
-      - manager/src/main/res/values/strings_logs.xml
-      - manager/src/main/res/values/strings_store.xml
+      - manager-ui/src/main/res/values/strings_appearance.xml
+      - manager-ui/src/main/res/values/strings_language.xml
+      - manager-ui/src/main/res/values/strings_logs.xml
+      - manager-ui/src/main/res/values/strings_modules.xml
+      - manager-ui/src/main/res/values/strings_nav.xml
+      - manager-ui/src/main/res/values/strings_store.xml
+      - manager-ui/src/main/res/values/strings_trace.xml
       - daemon/src/main/res/values/strings.xml
 
 jobs:

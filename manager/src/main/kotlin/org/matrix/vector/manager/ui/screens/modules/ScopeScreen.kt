@@ -16,10 +16,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.ui.graphics.vector.ImageVector
-import org.matrix.vector.manager.ui.components.ChoiceRow
-import org.matrix.vector.manager.ui.components.SheetAction
-import org.matrix.vector.manager.ui.components.SheetHeading
-import org.matrix.vector.manager.ui.components.ToggleRow
+import org.matrix.vector.ui.ChoiceRow
+import org.matrix.vector.ui.SheetAction
+import org.matrix.vector.ui.SheetHeading
+import org.matrix.vector.ui.ToggleRow
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -111,7 +111,7 @@ import org.matrix.vector.manager.ui.components.VectorSnackbarHost
 import org.matrix.vector.manager.ui.components.show
 import org.matrix.vector.manager.ui.components.PackageActionResult
 import org.matrix.vector.manager.ui.components.PackageActionSheet
-import org.matrix.vector.manager.ui.components.SearchField
+import org.matrix.vector.ui.SearchField
 import org.matrix.vector.manager.ui.theme.VectorMono
 
 class ScopeViewModelFactory(private val packageName: String, private val userId: Int) :

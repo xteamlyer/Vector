@@ -20,6 +20,15 @@ public class Startup {
         }
     }
 
+    /**
+     * Registers a pre-built {@code LoadedApk} (the LSPatch rootless target) with the modern hooks so
+     * its package lifecycle is dispatched when its class loader is realized. See
+     * {@link VectorStartup#trackLoadedApk(Object)}.
+     */
+    public static void trackLoadedApk(Object loadedApk) {
+        VectorStartup.trackLoadedApk(loadedApk);
+    }
+
     public static void initXposed(boolean isSystem, String processName, String appDir, IFrameworkService service) {
         // Establish the Dependency Injection contract
         VectorBootstrap.INSTANCE.init(new LegacyDelegateImpl());

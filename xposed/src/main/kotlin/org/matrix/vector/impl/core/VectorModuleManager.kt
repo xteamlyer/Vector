@@ -51,6 +51,12 @@ object VectorModuleManager {
     // Reloads are serialized per module within this process; the daemon serializes per target.
     private val reloadLocks = ConcurrentHashMap<String, ReentrantLock>()
 
+    /** The class loader a loaded module runs in, or null if no generation is loaded for it. */
+    fun getModuleClassLoader(packageName: String): ClassLoader? = generations[packageName]?.classLoader
+
+    /** Packages of the modules currently loaded in this process. */
+    fun loadedModulePackages(): Set<String> = generations.keys.toSet()
+
     /**
      * Loads a module APK, instantiates its entry classes, and binds them to the Vector framework.
      */

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import org.matrix.vector.manager.BuildConfig
 import org.matrix.vector.manager.logW
-import org.matrix.vector.manager.data.model.PER_USER_RANGE
+import org.matrix.vector.ui.module.PER_USER_RANGE
 
 sealed class PackageEvent {
     data class Added(val packageName: String, val userId: Int) : PackageEvent()

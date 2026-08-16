@@ -1,5 +1,6 @@
 package org.matrix.vector.manager.ui.navigation
 
+import org.matrix.vector.ui.R as UiR
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.Home
@@ -113,7 +114,7 @@ val TOP_LEVEL_DESTINATIONS: List<TopLevelDestination> =
             "store",
             TopLevelRoute.Store,
             Icons.Rounded.CloudDownload,
-            R.string.nav_store,
+            UiR.string.nav_store,
         ),
         TopLevelDestination(
             "logs",

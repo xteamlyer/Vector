@@ -1,0 +1,6 @@
+<resources>
+    <string name="update_variant_release">Стабільна</string>
+    <string name="update_variant_debug">Зневаджувальна</string>
+    <string name="update_variant_release_why">Збірка на щодень</string>
+    <string name="update_variant_debug_why">Докладні журнали, для звіту про помилку</string>
+</resources>

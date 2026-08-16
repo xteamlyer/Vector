@@ -139,6 +139,7 @@ android {
 
 dependencies {
     implementation(projects.services.managerService)
+    implementation(projects.managerUi)
 
     implementation(libs.gson)
     implementation(libs.okhttp)

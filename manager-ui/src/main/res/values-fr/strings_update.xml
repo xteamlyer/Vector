@@ -1,0 +1,6 @@
+<resources>
+    <string name="update_variant_release">Version finale</string>
+    <string name="update_variant_debug">Débogage</string>
+    <string name="update_variant_release_why">La version à utiliser au quotidien</string>
+    <string name="update_variant_debug_why">Journaux détaillés, pour un rapport de bug</string>
+</resources>

@@ -1,0 +1,6 @@
+<resources>
+    <string name="update_variant_release">יציבה</string>
+    <string name="update_variant_debug">ניפוי שגיאות</string>
+    <string name="update_variant_release_why">הגרסה ליום־יום</string>
+    <string name="update_variant_debug_why">יומנים מפורטים, לדיווח על תקלה</string>
+</resources>

@@ -11,6 +11,8 @@
 #include <vector>
 
 #include "core/config_bridge.h"
+#include "elf/elf_image.h"
+#include "elf/symbol_cache.h"
 #include "jni/jni_bridge.h"
 #include "jni/jni_hooks.h"
 
@@ -786,11 +788,43 @@ VECTOR_DEF_NATIVE_METHOD(jboolean, HookBridge, setTrusted, jobject cookie) {
  * @return JNI_TRUE when the field is no longer final.
  */
 VECTOR_DEF_NATIVE_METHOD(jboolean, HookBridge, makeFieldWritable, jobject field, jint modifiers) {
-    // jfieldID is the ArtField itself, and `access_flags_` follows the four-byte compressed
-    // `declaring_class_` root that starts it.
-    auto *art_field = reinterpret_cast<uint32_t *>(env->FromReflectedField(field));
-    if (art_field == nullptr) return JNI_FALSE;
+    constexpr uintptr_t kMinArtFieldAddr = 0x1000u;
 
+    // A jfieldID is the ArtField pointer under JniIdType kPointer (the default), so use it directly
+    // and keep the original path there. A debuggable process runs kIndices, where FromReflectedField
+    // returns a small table index instead of a pointer; only then decode the reflected Field to its
+    // mirror::Field and read its ArtField, which is independent of the id encoding.
+    auto *art_field = reinterpret_cast<uint32_t *>(env->FromReflectedField(field));
+    if (reinterpret_cast<uintptr_t>(art_field) < kMinArtFieldAddr) {
+        using CurrentFromGdb = void *(*)();
+        using DecodeJObject = void *(*)(void * /*Thread*/, jobject);  // Thread::DecodeJObject() const
+        using GetArtField = void *(*)(void * /*mirror::Field*/);      // mirror::Field::GetArtField()
+
+        static const auto *art = ElfSymbolCache::GetArt();
+        static const auto current_thread =
+            art ? art->getSymbAddress<CurrentFromGdb>("_ZN3art6Thread14CurrentFromGdbEv") : nullptr;
+        static const auto decode_jobject =
+            art ? art->getSymbAddress<DecodeJObject>("_ZNK3art6Thread13DecodeJObjectEP8_jobject")
+                : nullptr;
+        static const auto get_art_field =
+            art ? art->getSymbAddress<GetArtField>("_ZN3art6mirror5Field11GetArtFieldEv") : nullptr;
+
+        if (current_thread && decode_jobject && get_art_field) {
+            if (void *self = current_thread()) {
+                if (void *field_obj = decode_jobject(self, field)) {
+                    art_field = reinterpret_cast<uint32_t *>(get_art_field(field_obj));
+                }
+            }
+        }
+    }
+
+    // Reject null / an unresolved index / a bogus decode before dereferencing: a real ArtField is a
+    // heap address well above the first page.
+    if (reinterpret_cast<uintptr_t>(art_field) < kMinArtFieldAddr) return JNI_FALSE;
+
+    // `access_flags_` follows the four-byte compressed `declaring_class_` root that starts the
+    // ArtField. Require the Java-visible flags to equal `modifiers`; a mismatch means this is not the
+    // field we think it is (stale decode, different layout) -- refuse rather than write wrong memory.
     constexpr uint32_t kAccJavaFlagsMask = 0xFFFFu;
     constexpr uint32_t kAccFinal = 0x0010u;
 

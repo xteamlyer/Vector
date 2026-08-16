@@ -1,0 +1,7 @@
+<resources>
+    <!-- Debug/Release variant picker, shared by the framework updater and LSPatch's manager updater. -->
+    <string name="update_variant_release">Release</string>
+    <string name="update_variant_debug">Debug</string>
+    <string name="update_variant_release_why">The build to run day to day</string>
+    <string name="update_variant_debug_why">Verbose logging, for a bug report</string>
+</resources>

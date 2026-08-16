@@ -1,14 +1,16 @@
 package org.matrix.vector.manager.ui.screens.update
 
+import org.matrix.vector.ui.R as UiR
 import org.matrix.vector.manager.data.repository.FrameworkUpdateState
 import org.matrix.vector.manager.data.repository.divergesFrom
 import androidx.compose.foundation.clickable
 import org.matrix.vector.manager.ui.theme.currentLocale
 import org.matrix.vector.manager.ui.theme.LocalizedOverlay
-import org.matrix.vector.manager.ui.components.SheetHeading
-import org.matrix.vector.manager.ui.components.sheetRowColors
+import org.matrix.vector.ui.SheetHeading
+import org.matrix.vector.ui.sheetRowColors
 import org.matrix.vector.manager.data.repository.ReleaseDirection
 import org.matrix.vector.manager.data.github.FrameworkRelease
+import org.matrix.vector.manager.data.github.GitHubRepository
 import java.util.Date
 import java.text.DateFormat
 import androidx.compose.foundation.verticalScroll
@@ -25,10 +27,9 @@ import org.matrix.vector.manager.data.github.ZipVariant
 import org.matrix.vector.manager.data.github.CanaryArtifact
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.animation.AnimatedContent
+import org.matrix.vector.ui.update.VariantPicker
+import org.matrix.vector.ui.update.VariantChoice
+import org.matrix.vector.ui.update.formatSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -80,7 +81,11 @@ import kotlinx.coroutines.launch
 import org.matrix.vector.ipc.IFrameworkInstallReceiver
 import org.matrix.vector.manager.R
 import org.matrix.vector.manager.data.repository.FlashStep
-import org.matrix.vector.manager.ui.screens.repo.StoreHtmlPane
+import org.matrix.vector.ui.store.StoreHtmlPane
+import org.matrix.vector.ui.store.releaseMarkdownToHtml
+import org.matrix.vector.manager.di.ServiceLocator
+import org.matrix.vector.manager.ui.screens.web.fetchStoreSubresource
+import org.matrix.vector.manager.ui.screens.web.forWebView
 import org.matrix.vector.manager.ui.theme.VectorLogLine
 
 /**
@@ -174,7 +179,7 @@ fun FrameworkUpdateScreen(
                         IconButton(onClick = { onOpenUrl(url) }) {
                             Icon(
                                 Icons.AutoMirrored.Rounded.OpenInNew,
-                                contentDescription = stringResource(R.string.store_open_release),
+                                contentDescription = stringResource(UiR.string.store_open_release),
                             )
                         }
                     }
@@ -211,7 +216,7 @@ fun FrameworkUpdateScreen(
                 val html =
                     remember(release?.notesMarkdown) {
                         release?.notesMarkdown?.takeIf { it.isNotBlank() }?.let {
-                            releaseMarkdownToHtml(it)
+                            releaseMarkdownToHtml(it, GitHubRepository.REPO_URL)
                         }
                     }
                 when {
@@ -220,6 +225,10 @@ fun FrameworkUpdateScreen(
                             html = html,
                             modifier = Modifier.fillMaxSize(),
                             onOpenUrl = onOpenUrl,
+                            // Same sandbox the store README gets: subresources through the app's
+                            // client, and a context that forces the theme and network permission.
+                            fetchSubresource = { fetchStoreSubresource(ServiceLocator.http, it) },
+                            contextForWebView = { ctx, dark -> ctx.forWebView(dark) },
                         )
                     release == null -> Empty(stringResource(R.string.update_none))
                     else -> Empty(stringResource(R.string.update_no_notes))
@@ -415,8 +424,19 @@ private fun UpdateBar(
             FlashStep.Idle ->
                 Column {
                     // Above the button and only while idle: it is the question the button answers,
-                    // and once a flash is running the choice has already been made.
-                    VariantPicker(zips = zips, chosen = chosen, onChoose = onChoose)
+                    // and once a flash is running the choice has already been made. The picker is
+                    // the shared one in manager-ui; zips map to it by their variant key, and the
+                    // chosen key maps back to the ZipVariant the view model persists.
+                    VariantPicker(
+                        choices =
+                            zips.map {
+                                VariantChoice(it.variant.key, it.sizeInBytes, it.name)
+                            },
+                        selectedKey = chosen?.variant?.key,
+                        onSelect = { key ->
+                            ZipVariant.entries.firstOrNull { it.key == key }?.let(onChoose)
+                        },
+                    )
                     // Only when root is genuinely the problem. Tying this to the button's disabled
                     // state instead would tell a perfectly rooted device with nothing to install
                     // that it had no root.
@@ -492,96 +512,6 @@ private fun failureText(code: Int): String =
             stringResource(R.string.update_failed_download)
         else -> stringResource(R.string.update_failed_exit, code)
     }
-
-private fun formatSize(bytes: Long): String =
-    when {
-        bytes >= 1_048_576 -> "%.1f MB".format(bytes / 1_048_576.0)
-        bytes >= 1024 -> "%.0f kB".format(bytes / 1024.0)
-        else -> "$bytes B"
-    }
-
-/**
- * Which of the release's builds to install.
- *
- * CI publishes two zips per release, Release and Debug, and the choice has to be the reader's: the
- * troubleshooting screen tells them a debug build is what maintainers need to help, so the app has
- * to be able to install one.
- *
- * A segmented row rather than checkboxes, because this is one-of-two rather than on-and-off: two
- * checkboxes permit neither and both, and a single "install the debug build" makes the ordinary
- * choice an unlabelled absence. It is the same control the theme selector uses, for the same
- * reason — the shared outline says "it is one of these".
- *
- * The size sits on each segment because it is the part of the decision that is otherwise a
- * surprise, and it is the size the release itself reports rather than an assumption about which
- * build is bigger. The line beneath says what the choice means and changes with it, so the answer
- * arrives at the moment the question is asked.
- *
- * One zip means no control at all — nobody should be asked to choose between one thing — and an
- * unrecognised name keeps its own file name rather than being labelled as something it may not be.
- */
-@Composable
-private fun VariantPicker(
-    zips: List<CanaryArtifact>,
-    chosen: CanaryArtifact?,
-    onChoose: (ZipVariant) -> Unit,
-) {
-    if (zips.size < 2) return
-    val colors = MaterialTheme.colorScheme
-    // Release first, whatever order the release listed its assets in, so the default sits under the
-    // reader's thumb rather than wherever GitHub happened to put it.
-    val ordered = zips.sortedBy { it.variant.ordinal }
-
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-        ordered.forEachIndexed { index, zip ->
-            SegmentedButton(
-                selected = zip.name == chosen?.name,
-                onClick = { onChoose(zip.variant) },
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = ordered.size),
-                icon = {},
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text =
-                            when (zip.variant) {
-                                ZipVariant.Release -> stringResource(R.string.update_variant_release)
-                                ZipVariant.Debug -> stringResource(R.string.update_variant_debug)
-                                ZipVariant.Other -> zip.name
-                            },
-                        style = MaterialTheme.typography.labelLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = formatSize(zip.sizeInBytes),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = colors.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-    }
-
-    val why =
-        when (chosen?.variant) {
-            ZipVariant.Debug -> stringResource(R.string.update_variant_debug_why)
-            ZipVariant.Release -> stringResource(R.string.update_variant_release_why)
-            else -> null
-        }
-    if (why != null) {
-        Spacer(Modifier.height(6.dp))
-        // Crossfaded so the sentence reads as the answer to the tap that just happened rather
-        // than as text that was always there.
-        AnimatedContent(targetState = why, label = "variant") { text ->
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium,
-                color = colors.onSurfaceVariant,
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-    }
-}
 
 /**
  * How much of a version row the status on its right may take.

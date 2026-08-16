@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">שפה</string>
+    <string name="language_system">ברירת המחדל של המערכת</string>
+    <string name="language_system_summary">לפי השפה שמוגדרת בטלפון</string>
+    <string name="language_help">עזרה בתרגום</string>
+    <string name="language_help_short">תרגום</string>
+</resources>

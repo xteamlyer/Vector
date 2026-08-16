@@ -64,6 +64,7 @@ import androidx.compose.ui.draw.alpha
 import android.content.res.Configuration
 import java.util.Locale
 import org.matrix.vector.manager.R
+import org.matrix.vector.ui.R as UiR
 import org.matrix.vector.manager.data.log.CrashRecorder
 import org.matrix.vector.manager.data.model.ManagerCopy
 import org.matrix.vector.manager.data.model.XposedApi
@@ -129,7 +130,7 @@ fun SystemStatusScreen(
     val daemonAlive = status.daemonUsable
     val snackbars = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val copied = stringResource(R.string.copied)
+    val copied = stringResource(UiR.string.copied)
     val shortcutRefused = stringResource(R.string.launcher_shortcut_refused)
     val installDone = stringResource(R.string.launcher_install_done)
 
@@ -168,7 +169,7 @@ fun SystemStatusScreen(
                     ) {
                         Icon(
                             Icons.Rounded.ContentCopy,
-                            contentDescription = stringResource(R.string.action_copy_all),
+                            contentDescription = stringResource(UiR.string.action_copy_all),
                         )
                     }
                 },

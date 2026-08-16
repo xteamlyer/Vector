@@ -3,7 +3,6 @@
 
     <string name="nav_home">Ana sayfa</string>
     <string name="nav_modules">Modüller</string>
-    <string name="nav_store">Katalog</string>
     <string name="nav_logs">Günlükler</string>
 
     <string name="panels_done">Bitti</string>
@@ -46,9 +45,6 @@
     <string name="info_not_injected">Enjekte edilmedi</string>
     <string name="status_notification">Durum bildirimi</string>
     <string name="status_notification_summary">Vector\'ün çalıştığını gösteren kalıcı bir bildirim.</string>
-    <string name="action_copy_all">Tümünü kopyala</string>
-    <string name="copied">Panoya kopyalandı</string>
-
     <string name="home_quarter_title">Son hareketler</string>
     <plurals name="home_commit_count">
         <item quantity="one">%1$d commit</item>
@@ -287,16 +283,9 @@
     <string name="update_failed_start">Kurulum programı başlatılamadı.</string>
     <string name="update_failed_download">Güncelleme indirilemedi.</string>
     <string name="update_failed_exit">Kurulum programı başarısız oldu (çıkış %1$d).</string>
-    <string name="store_mute_updates">Bu modülün güncellemelerini yok say</string>
-    <string name="store_mute_updates_summary">Ne burada ne de modül listesinde artık eski sayılır</string>
-    <string name="store_options">Seçenekler</string>
     <string name="scope_framework_shared">Tüm kullanıcıların paylaştığı tek bir süreç, dolayısıyla bu cihazın tamamını etkiler</string>
     <string name="scope_self_hook">Bu modül kendi uygulamasına yüklenir, etkin olduğunu böyle bildirir</string>
     <string name="update_no_output">Kurulum programı hiçbir çıktı üretmedi.</string>
-    <string name="update_variant_release">Kararlı</string>
-    <string name="update_variant_debug">Hata ayıklama</string>
-    <string name="update_variant_release_why">Günlük kullanım için</string>
-    <string name="update_variant_debug_why">Ayrıntılı günlükler, hata bildirimi için</string>
     <string name="update_versions">Tüm sürümler</string>
     <string name="update_installed">Kurulu</string>
     <string name="update_older">Daha eski</string>
@@ -398,7 +387,6 @@
         <item quantity="one">yukarıdakinin aynısı %1$d çerçeve daha</item>
         <item quantity="other">yukarıdakilerin aynısı %1$d çerçeve daha</item>
     </plurals>
-    <string name="crash_frame_copied">Çerçeve kopyalandı</string>
     <string name="crash_unreadable">Bu çökme okunamadı. Olduğu gibi kopyalayıp bildirime ekleyin.</string>
     <string name="force_launcher_icons">Uygulamaların başlatıcı simgesini gizlemesini engelle</string>
     <string name="force_launcher_icons_summary">Android 10\'dan beri, kendi başlatıcı simgesini gizleyen bir uygulamaya, uygulama bilgisi sayfasını açan bir simge geri verilir. Gizli kalabilmesi için bunu kapatın — başlatıcınız yeniden başlatılana kadar durumu yansıtmayabilir. Hiçbir zaman başlatıcı simgesi olmamış uygulamalar, çoğu modül dahil, bundan etkilenmez.</string>

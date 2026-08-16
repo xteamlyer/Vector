@@ -13,28 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.matrix.vector.manager.data.model.ReleaseAsset
+import org.matrix.vector.ui.store.InstallStep
+import org.matrix.vector.ui.store.ReleaseAsset
 import org.matrix.vector.manager.ipc.commitForResult
 import org.matrix.vector.manager.ipc.requestReplaceExisting
 import org.matrix.vector.manager.logW
-
-/** Where an install has got to. One at a time, because a user installs one module at a time. */
-sealed interface InstallStep {
-
-    data object Idle : InstallStep
-
-    data class Downloading(val packageName: String, val bytes: Long, val total: Long) : InstallStep
-
-    /** Handed to the package installer; nothing more to report until it answers. */
-    data class Installing(val packageName: String) : InstallStep
-
-    /** Standalone only: the system's own install prompt is up and waiting on the user. */
-    data class Confirming(val packageName: String) : InstallStep
-
-    data class Done(val packageName: String) : InstallStep
-
-    data class Failed(val packageName: String, val reason: String?) : InstallStep
-}
 
 /**
  * Downloads a release asset straight into a `PackageInstaller` session.

@@ -6,19 +6,8 @@ import androidx.compose.ui.platform.LocalContext
 import java.util.Locale
 import org.matrix.vector.manager.ui.theme.currentLocale
 
-/**
- * Compact counts for the project footer: 11905 becomes "11.9k".
- *
- * The locale is passed in rather than read from `Locale.getDefault()`, which is the *process*
- * default and stays the host app's: a reader on a French phone who has set the app to English would
- * otherwise be shown "11,9k".
- */
-fun compactCount(value: Int, locale: Locale): String =
-    when {
-        value < 1_000 -> value.toString()
-        value < 1_000_000 -> String.format(locale, "%.1fk", value / 1000f)
-        else -> String.format(locale, "%.1fM", value / 1_000_000f)
-    }
+// compactCount for the project footer now lives in the shared lib as org.matrix.vector.ui.compactCount
+// (used by the shared RepoStatsRow); it was lifted out of here so both apps' Home footers share it.
 
 /**
  * The precise moment a commit landed, in the device's locale and 12/24-hour preference.

@@ -2,9 +2,9 @@ package org.matrix.vector.manager.di
 
 import org.matrix.vector.manager.data.model.ModuleDetectionCache
 import java.io.File
-import org.matrix.vector.manager.ui.screens.repo.latestOn
-import org.matrix.vector.manager.ui.screens.repo.StoreChannel
-import org.matrix.vector.manager.data.model.StoreEntry
+import org.matrix.vector.ui.store.latestOn
+import org.matrix.vector.ui.store.StoreChannel
+import org.matrix.vector.ui.store.StoreEntry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.combine
@@ -290,7 +290,7 @@ object ServiceLocator {
      */
     fun prefetch() {
         appScope.launch { runCatching { apps.getInstalledApps() } }
-        appScope.launch { runCatching { store.refresh() } }
+        appScope.launch { runCatching { store.refresh(false) } }
         // From disk only. Opening the manager is not by itself a reason to talk to GitHub, and
         // asking for a revalidation here would override Home's own gate — the one that decides how
         // rarely a launch is allowed to go and check.

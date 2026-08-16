@@ -44,12 +44,19 @@ import org.matrix.vector.manager.ui.navigation.rememberNavigator
 import org.matrix.vector.manager.ui.screens.home.HomeScreen
 import org.matrix.vector.manager.ui.screens.home.CrashTraceScreen
 import org.matrix.vector.manager.ui.screens.home.SystemStatusScreen
-import org.matrix.vector.manager.ui.screens.logs.LogTraceScreen
-import org.matrix.vector.manager.ui.screens.logs.LogsScreen
+import org.matrix.vector.ui.logs.LogTraceScreen
+import org.matrix.vector.manager.data.repository.VectorLogSource
+import org.matrix.vector.manager.ui.theme.LocalizedOverlay
+import org.matrix.vector.ui.LocalDialogLocalizer
+import org.matrix.vector.ui.logs.LogsScreen
 import org.matrix.vector.manager.ui.screens.modules.ModulesScreen
 import org.matrix.vector.manager.ui.screens.modules.ScopeScreen
-import org.matrix.vector.manager.ui.screens.repo.RepoDetailsScreen
-import org.matrix.vector.manager.ui.screens.repo.RepoScreen
+import androidx.compose.runtime.remember
+import org.matrix.vector.ui.store.RepoDetailsScreen
+import org.matrix.vector.manager.data.repository.VectorStoreInstallHost
+import org.matrix.vector.manager.ui.screens.web.fetchStoreSubresource
+import org.matrix.vector.manager.ui.screens.web.forWebView
+import org.matrix.vector.ui.store.RepoScreen
 import org.matrix.vector.manager.ui.screens.web.WebScreen
 
 /**
@@ -203,9 +210,22 @@ private fun EntryProviderScope<NavKey>.registerRoutes(navigator: Navigator) {
         )
     }
     entry<TopLevelRoute.Store> {
-        RepoScreen(onModuleClick = { packageName -> navigator.go(StoreDetail(packageName)) })
+        RepoScreen(
+            onModuleClick = { packageName -> navigator.go(StoreDetail(packageName)) },
+            dataSource = ServiceLocator.store,
+            settings = ServiceLocator.settings,
+        )
     }
-    entry<TopLevelRoute.Logs> { LogsScreen(onOpenTrace = { text -> navigator.go(LogTrace(text)) }) }
+    entry<TopLevelRoute.Logs> {
+        val logSource = remember { VectorLogSource() }
+        // The shared Logs screen's sheets and dialog open in their own windows, which reset the
+        // language override; this re-applies it inside them, exactly as VectorAlertDialog does.
+        CompositionLocalProvider(
+            LocalDialogLocalizer provides { content -> LocalizedOverlay(content) }
+        ) {
+            LogsScreen(source = logSource, onOpenTrace = { text -> navigator.go(LogTrace(text)) })
+        }
+    }
 
     entry<Scope> { route ->
         ScopeScreen(
@@ -215,7 +235,16 @@ private fun EntryProviderScope<NavKey>.registerRoutes(navigator: Navigator) {
         )
     }
     entry<StoreDetail> { route ->
-        RepoDetailsScreen(packageName = route.packageName, onNavigateBack = { navigator.back() })
+        RepoDetailsScreen(
+            packageName = route.packageName,
+            onNavigateBack = { navigator.back() },
+            onOpenUrl = { url -> navigator.go(Web(url)) },
+            dataSource = ServiceLocator.store,
+            settings = ServiceLocator.settings,
+            host = remember(route.packageName) { VectorStoreInstallHost(route.packageName) },
+            fetchSubresource = { fetchStoreSubresource(ServiceLocator.http, it) },
+            contextForWebView = { ctx, dark -> ctx.forWebView(dark) },
+        )
     }
     entry<SystemStatus> {
         SystemStatusScreen(

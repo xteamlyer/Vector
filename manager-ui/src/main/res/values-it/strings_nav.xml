@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_home">Home</string>
+    <string name="nav_modules">Moduli</string>
+    <string name="nav_logs">Log</string>
+    <string name="nav_manage">Gestisci</string>
+    <string name="panels_ball_close">Chiudi la navigazione</string>
+    <string name="panels_ball_open">Apri la navigazione</string>
+    <string name="panels_done">Fatto</string>
+    <string name="panels_hide">Nascondi %1$s</string>
+    <string name="panels_move_earlier">Sposta prima</string>
+    <string name="panels_move_later">Sposta dopo</string>
+    <string name="panels_show">Mostra %1$s</string>
+    <string name="settings_rearrange_panels">Riordina le sezioni</string>
+</resources>

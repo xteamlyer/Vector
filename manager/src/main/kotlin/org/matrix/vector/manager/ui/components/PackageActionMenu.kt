@@ -1,22 +1,19 @@
 package org.matrix.vector.manager.ui.components
 
+import org.matrix.vector.ui.R as UiR
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Launch
 import androidx.compose.material.icons.rounded.Bolt
@@ -37,8 +34,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -60,10 +55,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.matrix.vector.manager.data.model.ReleaseAsset
+import org.matrix.vector.ui.ActionDrawerItem
+import org.matrix.vector.ui.store.ConfirmInstall
+import org.matrix.vector.ui.store.ReleaseAsset
 import org.matrix.vector.manager.data.repository.ModuleUpdateQueue
-import org.matrix.vector.manager.ui.screens.repo.StoreChannel
-import org.matrix.vector.manager.ui.screens.repo.releasesOn
+import org.matrix.vector.ui.store.StoreChannel
+import org.matrix.vector.ui.store.releasesOn
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material3.TextButton
 import org.matrix.vector.manager.ui.screens.modules.ScopeViewModel
@@ -170,7 +167,7 @@ fun PackageActionSheet(
             },
             dismissButton = {
                 TextButton(onClick = { confirmSoftReboot = false }) {
-                    Text(stringResource(R.string.store_cancel))
+                    Text(stringResource(UiR.string.store_cancel))
                 }
             },
         )
@@ -233,7 +230,7 @@ LocalizedOverlay {
         // category marks. Naming it that way is the difference between a control that looks
         // pointless and one that says what it is for.
         if (!isSystemFramework && openable == true)
-        ActionRow(
+        ActionDrawerItem(
             icon = Icons.AutoMirrored.Rounded.Launch,
             title =
                 stringResource(
@@ -261,7 +258,7 @@ LocalizedOverlay {
         }
 
         if (!isSystemFramework)
-        ActionRow(icon = Icons.Rounded.Info, title = stringResource(R.string.action_app_info)) {
+        ActionDrawerItem(icon = Icons.Rounded.Info, title = stringResource(R.string.action_app_info)) {
             finish {
                 val intent =
                     Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -295,7 +292,7 @@ LocalizedOverlay {
         // confirmed first — this is the one action on this sheet that ends what the reader is
         // doing everywhere else on the phone.
         if (isSystemFramework) {
-            ActionRow(
+            ActionDrawerItem(
                 icon = Icons.Rounded.RestartAlt,
                 title = stringResource(R.string.action_soft_reboot),
                 subtitle = stringResource(R.string.action_soft_reboot_summary),
@@ -304,7 +301,7 @@ LocalizedOverlay {
                 confirmSoftReboot = true
             }
         } else {
-            ActionRow(
+            ActionDrawerItem(
                 icon = Icons.Rounded.Stop,
                 title = stringResource(R.string.action_force_stop),
             ) {
@@ -331,7 +328,7 @@ LocalizedOverlay {
         // methods a module wants to hook — which is about the app being hooked, not about the
         // module doing the hooking, so on a module it would be an expensive button for nothing.
         if (!isModule && !isSystemFramework) {
-            ActionRow(
+            ActionDrawerItem(
                 icon = Icons.Rounded.Bolt,
                 title = stringResource(R.string.action_optimize),
                 subtitle = stringResource(R.string.action_optimize_summary),
@@ -365,7 +362,7 @@ LocalizedOverlay {
 
         if (isModule) {
             HorizontalDivider(Modifier.padding(horizontal = 24.dp, vertical = 4.dp))
-            ActionRow(
+            ActionDrawerItem(
                 icon = Icons.Rounded.Delete,
                 title = stringResource(R.string.action_uninstall),
                 tint = colors.error,
@@ -396,96 +393,14 @@ LocalizedOverlay {
 }
 
 /**
- * The one shape every row on this sheet takes: a glyph in a tinted disc, the verb, and — when it
- * needs one — the sentence under it saying what the verb costs.
+ * One setting, in the same shape — the shared [ActionDrawerItem] disc layout — as the actions it
+ * sits among.
  *
- * The disc is what lets a destructive action look destructive: an error-red glyph on a bare row is
- * easy to miss, the same glyph on a red disc is not. Once one row carries it they all have to, or
- * the bare one reads as a different kind of thing sitting in the same list — which is what the mute
- * switch did while it was borrowing the generic [ToggleRow], a Material list item whose leading
- * icon has no disc and whose text starts ten pixels to the left of every other row here.
- *
- * The measurements are chosen so that one column runs down the whole sheet: 24dp of margin, a 40dp
- * disc and 20dp of gap put every title at 84dp, which is where the header puts the app's name over
- * its 44dp icon and 16dp gap.
- *
- * [trailing] is for a row that carries state as well as an action, and the click behaviour comes in
- * through [modifier] rather than as a callback: a switch row has to announce itself to a screen
- * reader as a switch, not as a button, and only the caller knows which it is.
+ * Not an [ActionDrawerItem] click: a switch row has to announce itself to a screen reader as a
+ * switch, not as a button, so the whole-row toggle comes in through the modifier and the item is
+ * left without an onClick. The switch itself takes no callback, so a tap on it cannot be counted
+ * twice.
  */
-@Composable
-private fun ActionRowLayout(
-    modifier: Modifier,
-    icon: ImageVector,
-    title: String,
-    subtitle: String?,
-    tint: Color?,
-    trailing: (@Composable () -> Unit)? = null,
-) {
-    val colors = MaterialTheme.colorScheme
-    val accent = tint ?: colors.onSurfaceVariant
-
-    Row(
-        modifier =
-            Modifier.fillMaxWidth()
-                .then(modifier)
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier =
-                Modifier.size(40.dp).clip(CircleShape).background(accent.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(22.dp))
-        }
-        Spacer(Modifier.width(20.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (tint == colors.error) colors.error else colors.onSurface,
-            )
-            if (subtitle != null) {
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.onSurfaceVariant,
-                )
-            }
-        }
-        if (trailing != null) {
-            Spacer(Modifier.width(12.dp))
-            trailing()
-        }
-    }
-}
-
-/**
- * One action.
- *
- * [onClick] is nullable because one row on this sheet is a statement rather than an action — "not
- * in the store" — and a row that ripples under a thumb and then does nothing is a worse answer than
- * one that visibly cannot be pressed.
- */
-@Composable
-private fun ActionRow(
-    icon: ImageVector,
-    title: String,
-    subtitle: String? = null,
-    tint: Color? = null,
-    onClick: (() -> Unit)?,
-) {
-    ActionRowLayout(
-        modifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
-        icon = icon,
-        title = title,
-        subtitle = subtitle,
-        tint = tint,
-    )
-}
-
-/** One setting, in the same shape as the actions it sits among. */
 @Composable
 private fun ActionToggleRow(
     icon: ImageVector,
@@ -494,19 +409,16 @@ private fun ActionToggleRow(
     onCheckedChange: (Boolean) -> Unit,
     subtitle: String? = null,
 ) {
-    ActionRowLayout(
+    ActionDrawerItem(
+        icon = icon,
+        title = title,
+        subtitle = subtitle,
         modifier =
             Modifier.toggleable(
                 value = checked,
                 role = Role.Switch,
                 onValueChange = onCheckedChange,
             ),
-        icon = icon,
-        title = title,
-        subtitle = subtitle,
-        tint = null,
-        // The whole row is the target, and the switch itself takes no callback, so a tap on it
-        // cannot be counted twice.
         trailing = { Switch(checked = checked, onCheckedChange = null) },
     )
 }
@@ -551,7 +463,7 @@ private fun ModuleUpdateSection(
     val entry = entries[packageName]
     if (entry == null) {
         if (catalog.loaded) {
-            ActionRow(
+            ActionDrawerItem(
                 icon = Icons.Rounded.CloudOff,
                 title = stringResource(R.string.action_not_in_store),
                 subtitle = stringResource(R.string.action_not_in_store_summary),
@@ -576,11 +488,11 @@ private fun ModuleUpdateSection(
 
     if (outdated) {
         val busy = queue.running && (queue.current?.packageName == packageName)
-        ActionRow(
+        ActionDrawerItem(
             icon = Icons.Rounded.ArrowCircleUp,
             title =
                 stringResource(
-                    if (entry.sameVersion) R.string.store_badge_reinstall
+                    if (entry.sameVersion) UiR.string.store_badge_reinstall
                     else R.string.action_update_to,
                     entry.latest?.versionName.orEmpty(),
                 ),
@@ -621,15 +533,15 @@ private fun ModuleUpdateSection(
     }
 
     ActionToggleRow(
-        title = stringResource(R.string.store_mute_updates),
+        title = stringResource(UiR.string.store_mute_updates),
         icon = Icons.Rounded.NotificationsOff,
         checked = packageName in muted,
         onCheckedChange = { settings.setUpdatesMuted(packageName, it) },
-        subtitle = stringResource(R.string.store_mute_updates_summary),
+        subtitle = stringResource(UiR.string.store_mute_updates_summary),
     )
 
     if (onOpenStore != null) {
-        ActionRow(
+        ActionDrawerItem(
             // The same glyph the Store tab carries, because it is the same place.
             icon = Icons.Rounded.CloudDownload,
             title = stringResource(R.string.action_open_store),
@@ -648,6 +560,10 @@ private fun ModuleUpdateSection(
             module = entry.module,
             packageName = packageName,
             asset = asset,
+            // Shell-mode installs commit with no further system prompt; the dialog says so.
+            silent =
+                context.checkSelfPermission("android.permission.INSTALL_PACKAGES") ==
+                    PackageManager.PERMISSION_GRANTED,
             onDismiss = { confirming = null },
             onConfirm = {
                 confirming = null

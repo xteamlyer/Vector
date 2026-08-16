@@ -2,6 +2,9 @@ package org.matrix.vector.manager.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import org.matrix.vector.ui.theme.SeedScheme
+import org.matrix.vector.ui.theme.ThemeMode
+import org.matrix.vector.ui.theme.toAmoled
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -12,17 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import org.matrix.vector.manager.di.ServiceLocator
-
-/** How the app resolves light vs dark. Persisted under the string keys used here. */
-enum class ThemeMode(val key: String) {
-    System("system"),
-    Light("light"),
-    Dark("dark");
-
-    companion object {
-        fun from(key: String?): ThemeMode = entries.firstOrNull { it.key == key } ?: System
-    }
-}
 
 @Composable
 fun VectorTheme(content: @Composable () -> Unit) {

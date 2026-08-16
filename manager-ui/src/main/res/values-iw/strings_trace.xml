@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crash_caused_by">נגרם על ידי</string>
+    <plurals name="crash_frames_elided">
+        <item quantity="one">מסגרת אחת נוספת, זהה לאלה שלמעלה</item>
+        <item quantity="two">שתי מסגרות נוספות, זהות לאלה שלמעלה</item>
+        <item quantity="many">%1$d מסגרות נוספות, זהות לאלה שלמעלה</item>
+        <item quantity="other">%1$d מסגרות נוספות, זהות לאלה שלמעלה</item>
+    </plurals>
+    <string name="crash_frame_copied">המסגרת הועתקה</string>
+    <string name="action_copy_all">העתקת הכול</string>
+    <string name="copied">הועתק ללוח</string>
+</resources>

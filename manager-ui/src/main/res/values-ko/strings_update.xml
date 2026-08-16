@@ -1,0 +1,6 @@
+<resources>
+    <string name="update_variant_release">정식</string>
+    <string name="update_variant_debug">디버그</string>
+    <string name="update_variant_release_why">평소 쓰는 빌드</string>
+    <string name="update_variant_debug_why">자세한 로그 포함, 버그 신고용</string>
+</resources>

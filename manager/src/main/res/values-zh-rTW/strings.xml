@@ -3,7 +3,6 @@
 
     <string name="nav_home">主畫面</string>
     <string name="nav_modules">模組</string>
-    <string name="nav_store">儲存庫</string>
     <string name="nav_logs">日誌</string>
 
     <string name="panels_done">完成</string>
@@ -46,9 +45,6 @@
     <string name="info_not_injected">未注入</string>
     <string name="status_notification">狀態通知</string>
     <string name="status_notification_summary">一則常駐通知，用於顯示 Vector 正在執行。</string>
-    <string name="action_copy_all">全部複製</string>
-    <string name="copied">已複製到剪貼簿</string>
-
     <string name="home_quarter_title">近期動態</string>
     <plurals name="home_commit_count">
         <item quantity="other">%1$d 次提交</item>
@@ -278,16 +274,9 @@
     <string name="update_failed_start">無法啟動安裝程式。</string>
     <string name="update_failed_download">無法下載此更新。</string>
     <string name="update_failed_exit">安裝程式失敗（結束碼 %1$d）。</string>
-    <string name="store_mute_updates">忽略此模組的更新</string>
-    <string name="store_mute_updates_summary">在此處與模組列表中都不再計為過期</string>
-    <string name="store_options">選項</string>
     <string name="scope_framework_shared">所有使用者共用的同一個行程，因此這會影響整台裝置</string>
     <string name="scope_self_hook">此模組會載入自己的應用程式，它正是以此回報自己已生效</string>
     <string name="update_no_output">安裝程式沒有任何輸出。</string>
-    <string name="update_variant_release">正式版</string>
-    <string name="update_variant_debug">偵錯版</string>
-    <string name="update_variant_release_why">日常使用的版本</string>
-    <string name="update_variant_debug_why">帶詳細日誌，用於回報問題</string>
     <string name="update_versions">全部版本</string>
     <string name="update_installed">目前已裝</string>
     <string name="update_older">較舊</string>
@@ -388,7 +377,6 @@
     <plurals name="crash_frames_elided">
         <item quantity="other">還有 %1$d 層呼叫堆疊，與上面相同</item>
     </plurals>
-    <string name="crash_frame_copied">已複製該層呼叫堆疊</string>
     <string name="crash_unreadable">無法讀取這次當機。請原樣複製並附在回報中。</string>
     <string name="force_launcher_icons">阻止應用程式隱藏自己的啟動器圖示</string>
     <string name="force_launcher_icons_summary">自 Android 10 起，隱藏了自己啟動器圖示的應用程式會被補上一個圖示，點按它會開啟該應用程式的應用程式資訊頁面。關閉此項可讓它維持隱藏——你的啟動器可能要等重新啟動之後才會更新。本來就沒有啟動器圖示的應用程式不受影響，大多數模組都屬於此類。</string>

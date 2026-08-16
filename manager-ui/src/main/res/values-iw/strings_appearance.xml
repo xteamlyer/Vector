@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appearance_theme">ערכת נושא</string>
+    <string name="appearance_theme_system">לפי המערכת</string>
+    <string name="appearance_theme_light">בהיר</string>
+    <string name="appearance_theme_dark">כהה</string>
+    <string name="appearance_color">צבע</string>
+    <string name="appearance_dynamic_color">צבעים מהרקע</string>
+    <string name="appearance_custom_color">בחירת צבע</string>
+    <string name="appearance_amoled">שחור מלא בערכה כהה</string>
+    <string name="appearance_amoled_summary">חוסך סוללה במסכי OLED.</string>
+    <string name="settings_ambience">משטח הכותרת</string>
+    <string name="ambience_snow">שלג</string>
+    <string name="ambience_maze">מבוך</string>
+    <string name="ambience_circuit">מעגל</string>
+    <string name="ambience_matrix">גשם של קוד</string>
+    <string name="ambience_none">דומם</string>
+</resources>

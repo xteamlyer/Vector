@@ -96,20 +96,34 @@ protected:
          */
         PreloadedDex(int fd, size_t size);
 
-        PreloadedDex(PreloadedDex &&other) noexcept : addr_(other.addr_), size_(other.size_) {
+        /**
+         * @brief Wraps DEX bytes already resident in memory, without taking ownership.
+         *
+         * For an embedder that already holds the framework DEX in a buffer it owns - a JVM
+         * {@code byte[]} pinned for the duration of the load, say - rather than in a file it can
+         * map. Destruction leaves the memory alone, so the caller must keep it alive until the
+         * class loader built from it has been constructed.
+         */
+        PreloadedDex(void *data, size_t size) : addr_(data), size_(size), owned_(false) {}
+
+        PreloadedDex(PreloadedDex &&other) noexcept
+            : addr_(other.addr_), size_(other.size_), owned_(other.owned_) {
             other.addr_ = nullptr;
             other.size_ = 0;
+            other.owned_ = false;
         }
 
         PreloadedDex &operator=(PreloadedDex &&other) noexcept {
             if (this != &other) {
-                if (addr_) {
+                if (addr_ && owned_) {
                     munmap(addr_, size_);
                 }
                 addr_ = other.addr_;
                 size_ = other.size_;
+                owned_ = other.owned_;
                 other.addr_ = nullptr;
                 other.size_ = 0;
+                other.owned_ = false;
             }
             return *this;
         }
@@ -126,6 +140,8 @@ protected:
     private:
         void *addr_;
         size_t size_;
+        // Whether this owns the mapping and must unmap it. False for the in-memory view above.
+        bool owned_ = true;
     };
 
     Context() = default;
