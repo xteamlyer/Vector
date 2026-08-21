@@ -100,19 +100,19 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
-import org.matrix.vector.manager.ui.components.VectorAlertDialog
+import org.matrix.vector.ui.SharedAlertDialog
 import org.matrix.vector.manager.ui.theme.LocalizedOverlay
 import org.matrix.vector.manager.R
 import org.matrix.vector.manager.data.model.AppInfo
 import org.matrix.vector.manager.di.ServiceLocator
-import org.matrix.vector.manager.ui.components.AppIcon
-import org.matrix.vector.manager.ui.components.SnackbarTone
-import org.matrix.vector.manager.ui.components.VectorSnackbarHost
-import org.matrix.vector.manager.ui.components.show
+import org.matrix.vector.ui.AppIcon
+import org.matrix.vector.ui.SnackbarTone
+import org.matrix.vector.ui.SharedSnackbarHost
+import org.matrix.vector.ui.show
 import org.matrix.vector.manager.ui.components.PackageActionResult
 import org.matrix.vector.manager.ui.components.PackageActionSheet
 import org.matrix.vector.ui.SearchField
-import org.matrix.vector.manager.ui.theme.VectorMono
+import org.matrix.vector.ui.theme.Mono
 
 class ScopeViewModelFactory(private val packageName: String, private val userId: Int) :
     ViewModelProvider.Factory {
@@ -279,7 +279,7 @@ fun ScopeScreen(
                         )
                         Text(
                             text = packageName,
-                            style = VectorMono,
+                            style = Mono,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             // A package name is read from both ends: the head says who publishes
@@ -318,7 +318,7 @@ fun ScopeScreen(
                 },
             )
         },
-        snackbarHost = { VectorSnackbarHost(snackbars) },
+        snackbarHost = { SharedSnackbarHost(snackbars) },
         // The module's own screen, in the corner rather than in the bar. The bar holds what the
         // screen *is* — whose scope, and whether it runs — and this is a departure from it: it
         // leaves for somewhere else.
@@ -492,7 +492,7 @@ fun ScopeScreen(
     // stored either way. It exists because system_server is the one target that cannot pick a
     // scope up by itself.
     if (frameworkRestartNeeded) {
-        VectorAlertDialog(
+        SharedAlertDialog(
             onDismissRequest = { viewModel.dismissFrameworkRestart() },
             icon = { Icon(Icons.Rounded.RestartAlt, contentDescription = null) },
             title = { Text(stringResource(R.string.scope_framework_restart_title)) },
@@ -514,7 +514,7 @@ fun ScopeScreen(
     }
 
     if (confirmStranded) {
-        // Three things the reader might mean and two slots to say them in — `VectorAlertDialog`
+        // Three things the reader might mean and two slots to say them in — `SharedAlertDialog`
         // wraps Material's `AlertDialog`, which has a confirm button and a dismiss button and
         // nothing else. Which two are offered depends on whether the module asked for anything,
         // and the third is always reachable by cancelling the dialog.
@@ -539,7 +539,7 @@ fun ScopeScreen(
                 Text(stringResource(R.string.scope_empty_disable))
             }
         }
-        VectorAlertDialog(
+        SharedAlertDialog(
             // Tapping outside, or the system back the dialog handles itself, is a cancel and not
             // an answer — so it goes back to the list being edited rather than off the screen.
             // It is also the only way to say "leave it exactly as it is" when the buttons are
@@ -985,7 +985,7 @@ private fun AppRow(
             Column {
                 Text(
                     ScopeViewModel.displayPackageName(app.packageName),
-                    style = VectorMono,
+                    style = Mono,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 if (origin != ScopeOrigin.Chosen) {

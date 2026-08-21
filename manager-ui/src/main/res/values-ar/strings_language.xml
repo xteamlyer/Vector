@@ -5,4 +5,5 @@
     <string name="language_system_summary">اتّباع اللغة المضبوطة على الهاتف</string>
     <string name="language_help">ساعِد في الترجمة</string>
     <string name="language_help_short">ترجمة</string>
+    <string name="language_translated_by">ترجمة: %1$s</string>
 </resources>

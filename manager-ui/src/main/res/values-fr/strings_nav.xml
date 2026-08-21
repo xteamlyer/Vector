@@ -12,4 +12,5 @@
     <string name="panels_show">Afficher %1$s</string>
     <string name="settings_rearrange_panels">Réorganiser les sections</string>
     <string name="nav_manage">Gérer</string>
+    <string name="settings_rearrange_panels_summary">Changez leur ordre, ou masquez celles que vous n\'ouvrez jamais.</string>
 </resources>

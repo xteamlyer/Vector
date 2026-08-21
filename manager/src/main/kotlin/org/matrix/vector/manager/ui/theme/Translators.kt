@@ -1,9 +1,6 @@
 package org.matrix.vector.manager.ui.theme
 
-import java.util.Locale
-
-/** Someone who translated the app, and where to find them if they want to be found. */
-data class Translator(val name: String, val url: String? = null)
+import org.matrix.vector.ui.locale.Translator
 
 /**
  * Who to thank for each language.
@@ -24,19 +21,6 @@ val TRANSLATORS: Map<String, List<Translator>> =
     mapOf(
         // "de" to listOf(Translator("Your Name", "https://github.com/you")),
     )
-
-/**
- * The credits for a language, tolerating the two ways Android and Java disagree about a tag.
- *
- * Indonesian is `in` in a resource folder and `id` in a language tag, and Hebrew is `iw` against
- * `he`; matching on the bare language as well as the full tag means a contributor can key their
- * entry either way and it still finds them.
- */
-fun translatorsFor(locale: Locale): List<Translator> =
-    TRANSLATORS[locale.toLanguageTag()]
-        ?: TRANSLATORS[locale.language]
-        ?: TRANSLATORS[locale.toLanguageTag().substringBefore('-')]
-        ?: emptyList()
 
 /** Where a translation is actually made. */
 const val CROWDIN_URL = "https://crowdin.com/project/lsposed_jingmatrix"

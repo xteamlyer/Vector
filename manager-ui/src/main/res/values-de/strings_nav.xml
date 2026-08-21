@@ -12,4 +12,5 @@
     <string name="panels_show">%1$s einblenden</string>
     <string name="settings_rearrange_panels">Bereiche neu anordnen</string>
     <string name="nav_manage">Verwalten</string>
+    <string name="settings_rearrange_panels_summary">Ändere ihre Reihenfolge oder blende aus, was du nie öffnest.</string>
 </resources>

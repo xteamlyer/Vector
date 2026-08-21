@@ -129,8 +129,6 @@
     <string name="settings_navigation">ナビゲーション</string>
     <string name="settings_floating_nav">フローティングナビゲーション</string>
     <string name="settings_floating_nav_summary">バーの代わりに、どこへでもドラッグできる小さなボールを表示します。長押しするとパネルが扇状に開き、タップすると開いたままの状態になります。</string>
-    <string name="settings_rearrange_panels">パネルの並べ替え</string>
-    <string name="settings_rearrange_panels_summary">並び順を変更したり、めったに開かないものを非表示にしたりできます。</string>
 
     <string name="settings_activity">活動フィード</string>
     <plurals name="settings_window_months">
@@ -252,7 +250,6 @@
     <string name="language_system">システムの設定に従う</string>
     <string name="language_system_summary">デバイスで設定されている言語に従います</string>
 
-    <string name="language_translated_by">翻訳者: %1$s</string>
     <string name="language_help_short">翻訳</string>
     <string name="language_help">Vector の翻訳に参加</string>
 

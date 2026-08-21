@@ -1,4 +1,4 @@
-package org.matrix.vector.manager.ui.components
+package org.matrix.vector.ui
 
 import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
@@ -26,9 +26,12 @@ import kotlinx.coroutines.withContext
  * App icons, straight from `PackageManager`.
  *
  * Deliberately not routed through an image-loading library. These are not network images: they come
- * from a local drawable that has to be rasterised anyway, and the scope editor renders hundreds of
- * them in a scrolling list, so what actually matters is a bounded cache and doing the rasterisation
- * off the main thread. That is this file, and it costs no dependency.
+ * from a local drawable that has to be rasterised anyway, and a manager renders hundreds of them in
+ * scrolling lists, so what actually matters is a bounded cache and doing the rasterisation off the
+ * main thread. That is this file, and it costs no dependency.
+ *
+ * Bounded is the point. Decoding every installed package's icon up front is what a manager reaches
+ * for first, and it costs a scan that walks every app and a map that never gives the memory back.
  */
 object AppIconCache {
 
@@ -41,29 +44,51 @@ object AppIconCache {
 
     fun cached(key: String): ImageBitmap? = cache.get(key)
 
+    /**
+     * The cache key for one app at one size.
+     *
+     * The uid is in the key because an app can be reinstalled or updated with a new icon while the
+     * process lives, and the size because the same app drawn at two sizes is two rasterisations.
+     * A package parsed out of an apk file has no uid, which is what keeps a module's own icon from
+     * colliding with the installed copy of the same package.
+     */
+    fun keyFor(info: ApplicationInfo, sizePx: Int): String =
+        "${info.packageName}:${info.uid}:$sizePx"
+
     suspend fun load(
         info: ApplicationInfo,
         packageManager: android.content.pm.PackageManager,
         sizePx: Int,
-    ): ImageBitmap? =
-        withContext(Dispatchers.IO) {
-            val key = "${info.packageName}:${info.uid}:$sizePx"
-            cache.get(key)?.let {
-                return@withContext it
-            }
-            val bitmap =
-                runCatching {
-                        val drawable = info.loadIcon(packageManager)
-                        val bmp = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
-                        val canvas = Canvas(bmp)
-                        drawable.setBounds(0, 0, sizePx, sizePx)
-                        drawable.draw(canvas)
-                        bmp.asImageBitmap()
-                    }
-                    .getOrNull() ?: return@withContext null
-            cache.put(key, bitmap)
-            bitmap
+    ): ImageBitmap? = withContext(Dispatchers.IO) { loadBlocking(info, packageManager, sizePx) }
+
+    /**
+     * The same, for a caller that is already on a worker thread.
+     *
+     * Rasterising a drawable is not something to do on the main thread, and this does not move
+     * itself off it -- so it is for code that is already off it, such as a package scan.
+     */
+    fun loadBlocking(
+        info: ApplicationInfo,
+        packageManager: android.content.pm.PackageManager,
+        sizePx: Int,
+    ): ImageBitmap? {
+        val key = keyFor(info, sizePx)
+        cache.get(key)?.let {
+            return it
         }
+        val bitmap =
+            runCatching {
+                    val drawable = info.loadIcon(packageManager)
+                    val bmp = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bmp)
+                    drawable.setBounds(0, 0, sizePx, sizePx)
+                    drawable.draw(canvas)
+                    bmp.asImageBitmap()
+                }
+                .getOrNull() ?: return null
+        cache.put(key, bitmap)
+        return bitmap
+    }
 }
 
 @Composable
@@ -75,7 +100,7 @@ fun AppIcon(
 ) {
     val context = LocalContext.current
     val sizePx = with(LocalDensity.current) { size.roundToPx() }
-    val key = "${applicationInfo.packageName}:${applicationInfo.uid}:$sizePx"
+    val key = AppIconCache.keyFor(applicationInfo, sizePx)
 
     // Seeded from the cache so an already-loaded icon draws on the first frame and the list does
     // not flicker while scrolling back over rows it has already shown.

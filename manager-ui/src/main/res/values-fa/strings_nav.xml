@@ -12,4 +12,5 @@
     <string name="panels_show">نمایش %1$s</string>
     <string name="settings_rearrange_panels">چیدمان دوبارهٔ بخش‌ها</string>
     <string name="nav_manage">مدیریت</string>
+    <string name="settings_rearrange_panels_summary">ترتیبشان را تغییر دهید، یا آن‌هایی را که هرگز باز نمی‌کنید پنهان کنید.</string>
 </resources>

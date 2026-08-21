@@ -16,4 +16,15 @@ interface LocaleController {
     val availableTags: List<String>
 
     fun setAppLocale(tag: String)
+
+    /**
+     * Who to thank for each language, keyed by tag.
+     *
+     * A reviewed list rather than a translatable string: a name here is rendered beside a *link*,
+     * and translation rights are cheaper to obtain than commit rights, so a URL arriving through
+     * the translation pipeline is a URL nobody reviewed shown under the project's name. Empty is a
+     * correct state -- the rows simply carry no credit.
+     */
+    val translators: Map<String, List<Translator>>
+        get() = emptyMap()
 }

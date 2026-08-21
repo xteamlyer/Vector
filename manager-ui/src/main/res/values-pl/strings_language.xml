@@ -5,4 +5,5 @@
     <string name="language_system_summary">Używaj języka ustawionego w telefonie</string>
     <string name="language_help">Pomóż w tłumaczeniu</string>
     <string name="language_help_short">Przetłumacz</string>
+    <string name="language_translated_by">Przetłumaczone przez %1$s</string>
 </resources>

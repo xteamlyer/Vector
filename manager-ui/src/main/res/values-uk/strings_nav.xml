@@ -12,4 +12,5 @@
     <string name="panels_show">Показати «%1$s»</string>
     <string name="settings_rearrange_panels">Змінити порядок розділів</string>
     <string name="nav_manage">Керування</string>
+    <string name="settings_rearrange_panels_summary">Змініть їхній порядок або сховайте ті, які ніколи не відкриваєте.</string>
 </resources>

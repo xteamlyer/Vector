@@ -12,4 +12,5 @@
     <string name="panels_show">%1$s 표시</string>
     <string name="settings_rearrange_panels">패널 순서 바꾸기</string>
     <string name="nav_manage">관리</string>
+    <string name="settings_rearrange_panels_summary">순서를 바꾸거나, 열지 않는 패널을 숨깁니다.</string>
 </resources>

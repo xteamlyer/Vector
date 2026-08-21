@@ -1,4 +1,4 @@
-package org.matrix.vector.manager.ui.navigation
+package org.matrix.vector.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,8 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
-import org.matrix.vector.manager.data.repository.SettingsRepository
-import org.matrix.vector.manager.di.ServiceLocator
 
 /**
  * The back stack, as an object with intent-revealing operations.
@@ -30,13 +28,13 @@ import org.matrix.vector.manager.di.ServiceLocator
  * `LocalNavigator.current.panels`, and why there is no second CompositionLocal and no
  * `rememberNavPanels` anywhere: a second source of truth is exactly what would let the bar, the
  * ball and the appearance sheet disagree about which panels exist while the reader is rearranging
- * them. The two writes are here for the same reason — the encoding has one home.
+ * them. The two writes go through [NavPanelStore] for the same reason — the encoding has one home.
  */
 @Stable
 class Navigator(
     val backStack: NavBackStack<NavKey>,
     private val panelsState: State<NavPanels>,
-    private val settings: SettingsRepository,
+    private val store: NavPanelStore,
 ) {
 
     /** The reader's panels. A snapshot read, so a composable that touches it recomposes. */
@@ -64,22 +62,33 @@ class Navigator(
      * for that frame the root names something the container is no longer drawing. A bar that
      * highlights nothing is worse than one highlighting the panel you are about to be moved to.
      */
-    val currentTopLevel: TopLevelRoute
+    val currentTopLevel: NavKey
         get() {
-            val root = backStack.firstOrNull() as? TopLevelRoute ?: return panels.start
-            return if (panels.isVisible(root)) root else panels.start
+            val root = backStack.firstOrNull() ?: return panels.start.route
+            return if (panels.isVisible(root)) root else panels.start.route
         }
 
     val canGoBack: Boolean
         get() = backStack.size > 1
 
     /** Push a detail destination on top of the current tab. */
-    fun go(route: Route) {
+    fun go(route: NavKey) {
         if (backStack.lastOrNull() != route) backStack.add(route)
     }
 
+    /**
+     * Put [route] where the current screen is, so back from it returns past this one.
+     *
+     * For a screen whose job ends the moment it is answered -- a picker that has been picked from.
+     * Leaving it on the stack would make Back from the screen it opened return to the question the
+     * reader has already answered.
+     */
+    fun replace(route: NavKey) {
+        if (backStack.isEmpty()) backStack.add(route) else backStack[backStack.lastIndex] = route
+    }
+
     /** Select a bar item, discarding whatever detail screens were open. */
-    fun switchTo(tab: TopLevelRoute) {
+    fun switchTo(tab: NavKey) {
         if (backStack.size == 1 && backStack.firstOrNull() == tab) return
         backStack.clear()
         backStack.add(tab)
@@ -94,12 +103,12 @@ class Navigator(
 
     /** Hide or restore a panel, and persist it. [key] is a TopLevelDestination.key. */
     fun setPanelHidden(key: String, hidden: Boolean) {
-        settings.setNavPanels(encodeNavPanels(panels.withHidden(key, hidden)))
+        store.setEncoded(encodeNavPanels(panels.withHidden(key, hidden)))
     }
 
     /** Reorder, and persist it. Both indices are into [NavPanels.all]. */
     fun movePanel(from: Int, to: Int) {
-        settings.setNavPanels(encodeNavPanels(panels.withMoved(from, to)))
+        store.setEncoded(encodeNavPanels(panels.withMoved(from, to)))
     }
 
     /**
@@ -115,28 +124,32 @@ class Navigator(
      * and emptying the list even for an instant hands NavDisplay a stack with no entries.
      */
     fun reconcilePanels() {
-        val root = backStack.firstOrNull() as? TopLevelRoute ?: return
-        if (!panels.isVisible(root)) backStack[0] = panels.start
+        val root = backStack.firstOrNull() ?: return
+        // Only a root that names a panel is this method's business. The type test this replaces
+        // said the same thing; asking the catalogue says it without the shared code having to know
+        // the host's route types. `all`, not `visible`: a hidden panel is still a panel, and it is
+        // exactly the root this exists to correct.
+        if (panels.all.none { it.route == root }) return
+        if (!panels.isVisible(root)) backStack[0] = panels.start.route
     }
 }
 
 val LocalNavigator = staticCompositionLocalOf<Navigator> { error("No Navigator in composition") }
 
 @Composable
-fun rememberNavigator(): Navigator {
-    val settings = ServiceLocator.settings
-    val stored = settings.navPanels.collectAsStateWithLifecycle()
+fun rememberNavigator(store: NavPanelStore, catalogue: List<TopLevelDestination>): Navigator {
+    val stored = store.encoded.collectAsStateWithLifecycle()
     // Derived rather than decoded on every recomposition: the string changes when a panel is
     // dragged or hidden and at no other time, while everything that reads the panels reads them
     // once per frame.
-    val panels = remember(stored) { derivedStateOf { decodeNavPanels(stored.value) } }
+    val panels = remember(stored, catalogue) { derivedStateOf { decodeNavPanels(stored.value, catalogue) } }
     // rememberNavBackStack persists across process death via SavedState, which matters here:
     // parasitically the manager's activity state is hand-managed by the zygisk hooker, so
     // anything that relies on the system restoring it needs to survive that path too. The first
     // visible panel is the seed and only the seed — a restored stack skips it entirely, which is
     // why the correction below is an effect that runs on every arrangement rather than a one-off.
-    val backStack = rememberNavBackStack(panels.value.start)
-    val navigator = remember(backStack, panels, settings) { Navigator(backStack, panels, settings) }
+    val backStack = rememberNavBackStack(panels.value.start.route)
+    val navigator = remember(backStack, panels, store) { Navigator(backStack, panels, store) }
     LaunchedEffect(navigator, panels.value) { navigator.reconcilePanels() }
     return navigator
 }

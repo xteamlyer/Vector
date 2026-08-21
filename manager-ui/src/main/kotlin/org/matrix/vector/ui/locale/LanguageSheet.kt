@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -63,6 +64,7 @@ fun LanguageSheet(
     controller: LocaleController,
     onDismiss: () -> Unit,
     onHelpTranslate: (() -> Unit)? = null,
+    onOpenUrl: ((String) -> Unit)? = null,
 ) {
     val current by controller.appLocale.collectAsStateWithLifecycle()
     val locales = remember(controller) { availableLocales(controller) }
@@ -126,6 +128,8 @@ fun LanguageSheet(
                             english = locale.getDisplayName(Locale.ENGLISH),
                             selected = current == locale.toLanguageTag(),
                             onClick = { controller.setAppLocale(locale.toLanguageTag()) },
+                            credits = controller.translators.forLocale(locale),
+                            onOpenUrl = onOpenUrl,
                         )
                     }
                 }
@@ -136,7 +140,14 @@ fun LanguageSheet(
 
 /** One language. Selected rows lift onto the primary container and spring a marker out. */
 @Composable
-private fun LanguageRow(native: String, english: String, selected: Boolean, onClick: () -> Unit) {
+private fun LanguageRow(
+    native: String,
+    english: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    credits: List<Translator> = emptyList(),
+    onOpenUrl: ((String) -> Unit)? = null,
+) {
     val colors = MaterialTheme.colorScheme
     val container by
         animateColorAsState(
@@ -179,6 +190,26 @@ private fun LanguageRow(native: String, english: String, selected: Boolean, onCl
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            // Only for languages a person put their name to, so the common row keeps its two
+            // lines. A chip rather than plain text because it is a target: tapping it opens the
+            // translator's page while a tap anywhere else on the row still picks the language.
+            if (credits.isNotEmpty()) {
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    credits.forEach { person ->
+                        AssistChip(
+                            onClick = { person.url?.let { url -> onOpenUrl?.invoke(url) } },
+                            enabled = person.url != null && onOpenUrl != null,
+                            label = {
+                                Text(
+                                    stringResource(R.string.language_translated_by, person.name),
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            },
+                        )
+                    }
+                }
+            }
         }
         Box(
             modifier =

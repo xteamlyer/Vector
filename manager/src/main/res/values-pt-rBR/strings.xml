@@ -134,8 +134,6 @@
     <string name="settings_navigation">Navegação</string>
     <string name="settings_floating_nav">Navegação flutuante</string>
     <string name="settings_floating_nav_summary">Substitui a barra por uma bolinha que você pode arrastar para onde quiser. Mantenha-a pressionada para abrir as seções em leque, ou toque nela para deixá-las abertas.</string>
-    <string name="settings_rearrange_panels">Reorganizar as seções</string>
-    <string name="settings_rearrange_panels_summary">Mude a ordem delas, ou oculte as que você nunca abre.</string>
 
     <string name="settings_activity">Feed de atividade</string>
     <plurals name="settings_window_months">
@@ -262,7 +260,6 @@
     <string name="language_system">Padrão do sistema</string>
     <string name="language_system_summary">Seguir o idioma configurado no telefone</string>
 
-    <string name="language_translated_by">Traduzido por %1$s</string>
     <string name="language_help_short">Traduzir</string>
     <string name="language_help">Ajude a traduzir o Vector</string>
 

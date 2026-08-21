@@ -134,8 +134,6 @@
     <string name="settings_navigation">Gezinme</string>
     <string name="settings_floating_nav">Yüzen gezinme</string>
     <string name="settings_floating_nav_summary">Çubuğu, istediğiniz yere sürükleyebileceğiniz küçük bir topla değiştirir. Panelleri yelpaze gibi açmak için basılı tutun, açık kalmaları için dokunun.</string>
-    <string name="settings_rearrange_panels">Panelleri yeniden düzenle</string>
-    <string name="settings_rearrange_panels_summary">Sıralarını değiştirin ya da hiç açmadıklarınızı gizleyin.</string>
 
     <string name="settings_activity">Hareket akışı</string>
     <plurals name="settings_window_months">
@@ -262,7 +260,6 @@
     <string name="language_system">Sistem varsayılanı</string>
     <string name="language_system_summary">Telefonda ayarlı dili izle</string>
 
-    <string name="language_translated_by">Çeviren: %1$s</string>
     <string name="language_help_short">Çevir</string>
     <string name="language_help">Vector\'ü çevirmeye yardım edin</string>
 

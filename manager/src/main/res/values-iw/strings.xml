@@ -148,8 +148,6 @@
     <string name="settings_navigation">ניווט</string>
     <string name="settings_floating_nav">ניווט צף</string>
     <string name="settings_floating_nav_summary">מחליף את הסרגל בכדור קטן שאפשר לגרור לכל מקום. לחיצה ארוכה פורשת את המקטעים במניפה, והקשה משאירה אותם פתוחים.</string>
-    <string name="settings_rearrange_panels">סידור המקטעים מחדש</string>
-    <string name="settings_rearrange_panels_summary">אפשר לשנות את סדרם, או להסתיר את מה שאף פעם לא נפתח.</string>
 
     <string name="settings_activity">זרם הפעילות</string>
     <plurals name="settings_window_months">
@@ -286,7 +284,6 @@
     <string name="language_system">ברירת המחדל של המערכת</string>
     <string name="language_system_summary">לפי השפה שמוגדרת בטלפון</string>
 
-    <string name="language_translated_by">תורגם על ידי %1$s</string>
     <string name="language_help_short">תרגום</string>
     <string name="language_help">עזרו לתרגם את Vector</string>
 

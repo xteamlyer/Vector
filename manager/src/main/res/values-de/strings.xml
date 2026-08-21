@@ -134,8 +134,6 @@
     <string name="settings_navigation">Navigation</string>
     <string name="settings_floating_nav">Schwebende Navigation</string>
     <string name="settings_floating_nav_summary">Ersetzt die Leiste durch einen kleinen Ball, den du überallhin ziehen kannst. Halte ihn gedrückt, um die Bereiche aufzufächern, oder tippe ihn an, damit sie offen bleiben.</string>
-    <string name="settings_rearrange_panels">Bereiche neu anordnen</string>
-    <string name="settings_rearrange_panels_summary">Ändere ihre Reihenfolge oder blende aus, was du nie öffnest.</string>
 
     <string name="settings_activity">Aktivitätsverlauf</string>
     <plurals name="settings_window_months">
@@ -262,7 +260,6 @@
     <string name="language_system">Systemstandard</string>
     <string name="language_system_summary">Der auf dem Telefon eingestellten Sprache folgen</string>
 
-    <string name="language_translated_by">Übersetzt von %1$s</string>
     <string name="language_help_short">Übersetzen</string>
     <string name="language_help">Vector übersetzen helfen</string>
 

@@ -88,7 +88,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
-import org.matrix.vector.manager.ui.components.VectorAlertDialog
+import org.matrix.vector.ui.SharedAlertDialog
 import org.matrix.vector.manager.ui.theme.LocalizedOverlay
 import android.text.format.Formatter
 import androidx.compose.foundation.rememberScrollState
@@ -114,15 +114,15 @@ import org.matrix.vector.manager.R
 import org.matrix.vector.ui.R as UiR
 import org.matrix.vector.manager.data.model.InstalledModule
 import org.matrix.vector.manager.di.ServiceLocator
-import org.matrix.vector.manager.ui.components.AppIcon
+import org.matrix.vector.ui.AppIcon
 import org.matrix.vector.manager.ui.components.PackageActionSheet
-import org.matrix.vector.manager.ui.components.SnackbarTone
-import org.matrix.vector.manager.ui.components.VectorSnackbarHost
-import org.matrix.vector.manager.ui.components.show
+import org.matrix.vector.ui.SnackbarTone
+import org.matrix.vector.ui.SharedSnackbarHost
+import org.matrix.vector.ui.show
 import org.matrix.vector.manager.ui.components.PackageActionResult
 import org.matrix.vector.ui.PanelHeader
 import org.matrix.vector.ui.SearchField
-import org.matrix.vector.manager.ui.theme.VectorMono
+import org.matrix.vector.ui.theme.Mono
 import androidx.compose.material3.Surface
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -268,7 +268,7 @@ fun ModulesScreen(
             }
         }
 
-    Scaffold(snackbarHost = { VectorSnackbarHost(snackbars) }) { innerPadding ->
+    Scaffold(snackbarHost = { SharedSnackbarHost(snackbars) }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             // Hoisted above the header: the count in it is the *visible* profile's, so the header
             // has to know which page is showing. Aggregating across profiles made "4 of 6 active"
@@ -433,7 +433,7 @@ fun ModulesScreen(
     }
 
     if (confirmUninstall) {
-        VectorAlertDialog(
+        SharedAlertDialog(
             onDismissRequest = { confirmUninstall = false },
             icon = { Icon(Icons.Rounded.Delete, contentDescription = null) },
             title = { Text(stringResource(R.string.modules_uninstall_title)) },
@@ -1007,7 +1007,7 @@ private fun SectionHeader(title: String, count: Int) {
             Spacer(Modifier.width(8.dp))
             Text(
                 text = count.toString(),
-                style = VectorMono,
+                style = Mono,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

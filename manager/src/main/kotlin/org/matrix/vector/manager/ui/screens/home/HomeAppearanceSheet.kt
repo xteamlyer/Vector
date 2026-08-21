@@ -73,9 +73,10 @@ import org.matrix.vector.ui.net.DohSettingSection
 import org.matrix.vector.manager.di.ServiceLocator
 import org.matrix.vector.ui.ColorWheel
 import org.matrix.vector.ui.ambience.AmbienceKind
-import org.matrix.vector.manager.ui.navigation.LocalNavigator
+import org.matrix.vector.ui.navigation.LocalNavigator
 import org.matrix.vector.ui.theme.SeedScheme
 import org.matrix.vector.ui.theme.ThemeMode
+import org.matrix.vector.ui.R as UiR
 
 /**
  * How this screen looks, edited from this screen.
@@ -221,7 +222,7 @@ LocalizedOverlay {
                 onCheckedChange = settings::setFloatingNav,
             )
             SheetAction(
-                title = stringResource(R.string.settings_rearrange_panels),
+                title = stringResource(UiR.string.settings_rearrange_panels),
                 icon = Icons.Rounded.Reorder,
                 onClick = {
                     // Edit mode and the dismissal in the one click, and deliberately without
@@ -234,7 +235,7 @@ LocalizedOverlay {
                     navigator.editingPanels = true
                     onDismiss()
                 },
-                subtitle = stringResource(R.string.settings_rearrange_panels_summary),
+                subtitle = stringResource(UiR.string.settings_rearrange_panels_summary),
             )
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))

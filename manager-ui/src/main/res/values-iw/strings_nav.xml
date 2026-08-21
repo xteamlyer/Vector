@@ -12,4 +12,5 @@
     <string name="panels_move_later">העברה אחורה</string>
     <string name="panels_show">הצגת %1$s</string>
     <string name="settings_rearrange_panels">סידור המקטעים מחדש</string>
+    <string name="settings_rearrange_panels_summary">אפשר לשנות את סדרם, או להסתיר את מה שאף פעם לא נפתח.</string>
 </resources>

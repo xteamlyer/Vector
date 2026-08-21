@@ -5,4 +5,5 @@
     <string name="language_system_summary">Telefonda ayarlı dili izle</string>
     <string name="language_help">Çeviriye yardım et</string>
     <string name="language_help_short">Çevir</string>
+    <string name="language_translated_by">Çeviren: %1$s</string>
 </resources>

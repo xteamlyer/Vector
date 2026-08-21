@@ -133,8 +133,6 @@
     <string name="settings_navigation">Navigasi</string>
     <string name="settings_floating_nav">Navigasi mengambang</string>
     <string name="settings_floating_nav_summary">Mengganti bilah dengan bola kecil yang bisa diseret ke mana saja. Tahan untuk mengembangkan panel, atau ketuk agar panel tetap terbuka.</string>
-    <string name="settings_rearrange_panels">Atur ulang panel</string>
-    <string name="settings_rearrange_panels_summary">Ubah urutannya, atau sembunyikan yang tidak pernah dibuka.</string>
 
     <string name="settings_activity">Umpan aktivitas</string>
     <plurals name="settings_window_months">
@@ -256,7 +254,6 @@
     <string name="language_system">Bawaan sistem</string>
     <string name="language_system_summary">Ikuti bahasa yang disetel di ponsel</string>
 
-    <string name="language_translated_by">Diterjemahkan oleh %1$s</string>
     <string name="language_help_short">Terjemahkan</string>
     <string name="language_help">Bantu menerjemahkan Vector</string>
 

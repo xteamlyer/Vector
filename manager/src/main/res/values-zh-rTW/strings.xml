@@ -129,8 +129,6 @@
     <string name="settings_navigation">導覽</string>
     <string name="settings_floating_nav">懸浮導覽</string>
     <string name="settings_floating_nav_summary">用一顆可以拖到任意位置的小球取代導覽列。按住小球會將面板呈扇形展開，輕觸則讓它們保持展開。</string>
-    <string name="settings_rearrange_panels">重新排列面板</string>
-    <string name="settings_rearrange_panels_summary">調整順序，或隱藏從不開啟的面板。</string>
 
     <string name="settings_activity">動態</string>
     <plurals name="settings_window_months">
@@ -253,7 +251,6 @@
     <string name="language_system">跟隨系統</string>
     <string name="language_system_summary">使用手機設定的語言</string>
 
-    <string name="language_translated_by">翻譯：%1$s</string>
     <string name="language_help_short">翻譯</string>
     <string name="language_help">協助翻譯 Vector</string>
 

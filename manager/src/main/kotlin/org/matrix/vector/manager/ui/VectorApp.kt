@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -20,44 +21,44 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import org.matrix.vector.manager.data.repository.VectorLogSource
+import org.matrix.vector.manager.data.repository.VectorStoreInstallHost
 import org.matrix.vector.manager.di.ServiceLocator
-import org.matrix.vector.manager.ui.navigation.FrameworkUpdate
-import org.matrix.vector.manager.ui.screens.update.FrameworkUpdateScreen
 import org.matrix.vector.manager.ui.navigation.Canary
-import org.matrix.vector.manager.ui.screens.canary.CanaryScreen
-import org.matrix.vector.manager.ui.navigation.Troubleshoot
-import org.matrix.vector.manager.ui.screens.report.TroubleshootScreen
+import org.matrix.vector.manager.ui.navigation.CrashTrace
 import org.matrix.vector.manager.ui.navigation.DeepLink
-import org.matrix.vector.manager.ui.navigation.FloatingPanelNav
-import org.matrix.vector.manager.ui.navigation.LocalNavigator
-import org.matrix.vector.manager.ui.navigation.Navigator
-import org.matrix.vector.manager.ui.navigation.PanelBar
-import org.matrix.vector.manager.ui.navigation.PanelEditDone
+import org.matrix.vector.manager.ui.navigation.FrameworkUpdate
+import org.matrix.vector.manager.ui.navigation.LogTrace
 import org.matrix.vector.manager.ui.navigation.Scope
 import org.matrix.vector.manager.ui.navigation.StoreDetail
-import org.matrix.vector.manager.ui.navigation.CrashTrace
-import org.matrix.vector.manager.ui.navigation.LogTrace
 import org.matrix.vector.manager.ui.navigation.SystemStatus
-import org.matrix.vector.manager.ui.navigation.Web
+import org.matrix.vector.manager.ui.navigation.TOP_LEVEL_DESTINATIONS
 import org.matrix.vector.manager.ui.navigation.TopLevelRoute
-import org.matrix.vector.manager.ui.navigation.rememberNavigator
-import org.matrix.vector.manager.ui.screens.home.HomeScreen
+import org.matrix.vector.manager.ui.navigation.Troubleshoot
+import org.matrix.vector.manager.ui.navigation.VectorFloatingNavSettings
+import org.matrix.vector.manager.ui.navigation.VectorNavPanelStore
+import org.matrix.vector.manager.ui.navigation.Web
+import org.matrix.vector.manager.ui.screens.canary.CanaryScreen
 import org.matrix.vector.manager.ui.screens.home.CrashTraceScreen
+import org.matrix.vector.manager.ui.screens.home.HomeScreen
 import org.matrix.vector.manager.ui.screens.home.SystemStatusScreen
-import org.matrix.vector.ui.logs.LogTraceScreen
-import org.matrix.vector.manager.data.repository.VectorLogSource
-import org.matrix.vector.manager.ui.theme.LocalizedOverlay
-import org.matrix.vector.ui.LocalDialogLocalizer
-import org.matrix.vector.ui.logs.LogsScreen
 import org.matrix.vector.manager.ui.screens.modules.ModulesScreen
 import org.matrix.vector.manager.ui.screens.modules.ScopeScreen
-import androidx.compose.runtime.remember
-import org.matrix.vector.ui.store.RepoDetailsScreen
-import org.matrix.vector.manager.data.repository.VectorStoreInstallHost
+import org.matrix.vector.manager.ui.screens.report.TroubleshootScreen
+import org.matrix.vector.manager.ui.screens.update.FrameworkUpdateScreen
+import org.matrix.vector.manager.ui.screens.web.WebScreen
 import org.matrix.vector.manager.ui.screens.web.fetchStoreSubresource
 import org.matrix.vector.manager.ui.screens.web.forWebView
+import org.matrix.vector.ui.logs.LogTraceScreen
+import org.matrix.vector.ui.logs.LogsScreen
+import org.matrix.vector.ui.navigation.FloatingPanelNav
+import org.matrix.vector.ui.navigation.LocalNavigator
+import org.matrix.vector.ui.navigation.Navigator
+import org.matrix.vector.ui.navigation.PanelBar
+import org.matrix.vector.ui.navigation.PanelEditDone
+import org.matrix.vector.ui.navigation.rememberNavigator
+import org.matrix.vector.ui.store.RepoDetailsScreen
 import org.matrix.vector.ui.store.RepoScreen
-import org.matrix.vector.manager.ui.screens.web.WebScreen
 
 /**
  * The app shell.
@@ -75,7 +76,7 @@ import org.matrix.vector.manager.ui.screens.web.WebScreen
  */
 @Composable
 fun VectorApp() {
-    val navigator = rememberNavigator()
+    val navigator = rememberNavigator(VectorNavPanelStore, TOP_LEVEL_DESTINATIONS)
 
     // Where the launch intent asked to open. The activity has no back stack to act on, so it leaves
     // the destination here and this is the first place there is one — on a cold start the splash is
@@ -174,6 +175,7 @@ fun VectorApp() {
                         panels = navigator.panels,
                         current = navigator.currentTopLevel,
                         onSelect = { route -> navigator.switchTo(route) },
+                        settings = VectorFloatingNavSettings,
                     )
                 }
             }
@@ -218,13 +220,7 @@ private fun EntryProviderScope<NavKey>.registerRoutes(navigator: Navigator) {
     }
     entry<TopLevelRoute.Logs> {
         val logSource = remember { VectorLogSource() }
-        // The shared Logs screen's sheets and dialog open in their own windows, which reset the
-        // language override; this re-applies it inside them, exactly as VectorAlertDialog does.
-        CompositionLocalProvider(
-            LocalDialogLocalizer provides { content -> LocalizedOverlay(content) }
-        ) {
-            LogsScreen(source = logSource, onOpenTrace = { text -> navigator.go(LogTrace(text)) })
-        }
+        LogsScreen(source = logSource, onOpenTrace = { text -> navigator.go(LogTrace(text)) })
     }
 
     entry<Scope> { route ->

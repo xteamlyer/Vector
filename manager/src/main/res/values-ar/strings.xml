@@ -154,8 +154,6 @@
     <string name="settings_navigation">التنقّل</string>
     <string name="settings_floating_nav">تنقّل عائم</string>
     <string name="settings_floating_nav_summary">يستعيض عن الشريط بكرة صغيرة يمكن سحبها إلى أي مكان. المس مطوّلًا لنشر الأقسام، أو انقر لإبقائها مفتوحة.</string>
-    <string name="settings_rearrange_panels">إعادة ترتيب الأقسام</string>
-    <string name="settings_rearrange_panels_summary">غيّر ترتيبها، أو أخفِ ما لا تفتحه أبدًا.</string>
 
     <string name="settings_activity">تدفّق النشاط</string>
     <plurals name="settings_window_months">
@@ -302,7 +300,6 @@
     <string name="language_system">لغة النظام</string>
     <string name="language_system_summary">اتّباع اللغة المضبوطة على الهاتف</string>
 
-    <string name="language_translated_by">ترجمة: %1$s</string>
     <string name="language_help_short">ترجمة</string>
     <string name="language_help">ساعِد في ترجمة Vector</string>
 

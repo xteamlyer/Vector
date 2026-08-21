@@ -12,4 +12,5 @@
     <string name="panels_show">Tampilkan %1$s</string>
     <string name="settings_rearrange_panels">Atur ulang panel</string>
     <string name="nav_manage">Kelola</string>
+    <string name="settings_rearrange_panels_summary">Ubah urutannya, atau sembunyikan yang tidak pernah dibuka.</string>
 </resources>

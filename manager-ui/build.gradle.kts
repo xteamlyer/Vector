@@ -35,6 +35,9 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // NavKey and NavBackStack appear in this module's public signatures -- TopLevelDestination
+    // carries a route, PanelBar takes one -- so a consumer cannot use the container without them.
+    api(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.webkit)
 }

@@ -12,4 +12,5 @@
     <string name="panels_show">%1$s öğesini göster</string>
     <string name="settings_rearrange_panels">Panelleri yeniden düzenle</string>
     <string name="nav_manage">Yönet</string>
+    <string name="settings_rearrange_panels_summary">Sıralarını değiştirin ya da hiç açmadıklarınızı gizleyin.</string>
 </resources>

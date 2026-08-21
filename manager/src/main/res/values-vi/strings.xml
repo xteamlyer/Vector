@@ -129,8 +129,6 @@
     <string name="settings_navigation">Điều hướng</string>
     <string name="settings_floating_nav">Điều hướng nổi</string>
     <string name="settings_floating_nav_summary">Thay thanh điều hướng bằng một quả bóng nhỏ có thể kéo tới bất kỳ đâu. Giữ để xòe các mục ra, hoặc chạm để giữ chúng mở.</string>
-    <string name="settings_rearrange_panels">Sắp xếp lại các mục</string>
-    <string name="settings_rearrange_panels_summary">Đổi thứ tự, hoặc ẩn những mục bạn không bao giờ mở.</string>
 
     <string name="settings_activity">Dòng hoạt động</string>
     <plurals name="settings_window_months">
@@ -252,7 +250,6 @@
     <string name="language_system">Theo hệ thống</string>
     <string name="language_system_summary">Dùng ngôn ngữ đã đặt trên điện thoại</string>
 
-    <string name="language_translated_by">Dịch bởi %1$s</string>
     <string name="language_help_short">Dịch</string>
     <string name="language_help">Giúp dịch Vector</string>
 

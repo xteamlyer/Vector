@@ -224,8 +224,6 @@
     <string name="settings_navigation">Nawigacja</string>
     <string name="settings_floating_nav">Pływająca nawigacja</string>
     <string name="settings_floating_nav_summary">Zastępuje pasek małą kulką, którą można przeciągnąć w dowolne miejsce. Przytrzymaj ją, aby rozłożyć panele, lub naciśnij, aby pozostały otwarte.</string>
-    <string name="settings_rearrange_panels">Zmień kolejność paneli</string>
-    <string name="settings_rearrange_panels_summary">Zmień ich kolejność albo ukryj te, których nigdy nie otwierasz.</string>
     <!-- Settings: activity feed -->
     <string name="settings_activity">Strumień aktywności</string>
     <plurals name="settings_window_months">
@@ -427,7 +425,6 @@
     <string name="language_title">Język</string>
     <string name="language_system">Domyślny systemowy</string>
     <string name="language_system_summary">Używaj języka ustawionego w telefonie</string>
-    <string name="language_translated_by">Przetłumaczone przez %1$s</string>
     <string name="language_help_short">Tłumacz</string>
     <string name="language_help">Pomóż tłumaczyć Vector</string>
     <string name="update_title">Aktualizacja frameworka</string>

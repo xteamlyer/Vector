@@ -1,4 +1,4 @@
-package org.matrix.vector.manager.ui.components
+package org.matrix.vector.ui
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -58,7 +58,7 @@ enum class SnackbarTone {
 }
 
 /** A message with a tone attached, carried through the standard [SnackbarHostState] channel. */
-class VectorSnackbarVisuals(
+class TonedSnackbarVisuals(
     override val message: String,
     val tone: SnackbarTone = SnackbarTone.Neutral,
     override val duration: SnackbarDuration =
@@ -71,25 +71,25 @@ class VectorSnackbarVisuals(
 /** Shows a toned message, replacing whatever is on screen. */
 suspend fun SnackbarHostState.show(message: String, tone: SnackbarTone = SnackbarTone.Neutral) {
     currentSnackbarData?.dismiss()
-    showSnackbar(VectorSnackbarVisuals(message, tone))
+    showSnackbar(TonedSnackbarVisuals(message, tone))
 }
 
 /**
- * The app's snackbar.
+ * The managers' snackbar.
  *
  * Material's default is a dark slab with a hard 4dp corner: inverse-surface, so it is dark on a
  * light theme and light on a dark one. That inversion is deliberate in the spec and wrong here — a
  * message that is the opposite colour to everything around it reads as belonging to the system
- * rather than to the app.
+ * rather than to the app showing it.
  *
  * So it sits on the app's own raised surface and earns its prominence from elevation and shape
  * instead of from inversion, and leads with an icon so the outcome is legible before the sentence
  * is read.
  */
 @Composable
-fun VectorSnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {
+fun SharedSnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {
     SnackbarHost(hostState = hostState, modifier = modifier) { data ->
-        val visuals = data.visuals as? VectorSnackbarVisuals
+        val visuals = data.visuals as? TonedSnackbarVisuals
         val tone = visuals?.tone ?: SnackbarTone.Neutral
         val colors = MaterialTheme.colorScheme
 
