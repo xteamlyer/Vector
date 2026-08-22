@@ -6,6 +6,7 @@ import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.matrix.vector.ui.net.NetworkSettings
 import org.matrix.vector.ui.store.RepoVersion
 import org.matrix.vector.ui.store.StoreInstall
 import org.matrix.vector.ui.store.StoreSettings
@@ -19,7 +20,7 @@ import org.matrix.vector.ui.store.StoreSettings
  * which parasitically happens far more often than a user would expect since the host is
  * `com.android.shell`.
  */
-class SettingsRepository(context: Context) : StoreSettings {
+class SettingsRepository(context: Context) : StoreSettings, NetworkSettings {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("vector_settings", Context.MODE_PRIVATE)
 
@@ -69,7 +70,7 @@ class SettingsRepository(context: Context) : StoreSettings {
      * the default costs nothing on a network where ordinary DNS already works.
      */
     private val _dohEnabled = MutableStateFlow(prefs.getBoolean("doh_enabled", true))
-    val dohEnabled: StateFlow<Boolean> = _dohEnabled.asStateFlow()
+    override val dohEnabled: StateFlow<Boolean> = _dohEnabled.asStateFlow()
 
     // --- Home activity feed ---
 
@@ -513,7 +514,7 @@ class SettingsRepository(context: Context) : StoreSettings {
         _updateChannel.value = channel
     }
 
-    fun setDohEnabled(enabled: Boolean) {
+    override fun setDohEnabled(enabled: Boolean) {
         prefs.edit().putBoolean("doh_enabled", enabled).apply()
         _dohEnabled.value = enabled
     }

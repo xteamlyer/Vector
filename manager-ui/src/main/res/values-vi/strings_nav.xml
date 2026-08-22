@@ -12,4 +12,5 @@
     <string name="panels_show">Hiện %1$s</string>
     <string name="settings_rearrange_panels">Sắp xếp lại các mục</string>
     <string name="nav_manage">Quản lý</string>
+    <string name="settings_rearrange_panels_summary">Đổi thứ tự, hoặc ẩn những mục bạn không bao giờ mở.</string>
 </resources>

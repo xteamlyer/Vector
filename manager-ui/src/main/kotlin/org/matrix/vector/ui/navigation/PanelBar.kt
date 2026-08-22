@@ -57,6 +57,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.navigation3.runtime.NavKey
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import org.matrix.vector.ui.R
@@ -78,16 +79,14 @@ private const val DRAG_LIFT = 1.08f
  * [editing] shows every panel, hidden ones dimmed, with a badge and a drag; otherwise it shows
  * [NavPanels.visible] and a long press asks for [onEdit]. Both index arguments of [onMove] are
  * indices into [NavPanels.all], which is what [editing] is showing when a drag is possible at all.
- * The selected item is decided by [currentKey], and [onSelect] hands back the whole destination so
- * the host can map its stable key to its own route type.
  */
 @Composable
 fun PanelBar(
     panels: NavPanels,
-    currentKey: String,
+    current: NavKey,
     editing: Boolean,
     suiteType: NavigationSuiteType,
-    onSelect: (TopLevelDestination) -> Unit,
+    onSelect: (NavKey) -> Unit,
     onEdit: () -> Unit,
     onToggleHidden: (key: String, hidden: Boolean) -> Unit,
     onMove: (from: Int, to: Int) -> Unit,
@@ -105,13 +104,13 @@ fun PanelBar(
             destination = destination,
             index = index,
             count = items.size,
-            selected = destination.key == currentKey,
+            selected = destination.route == current,
             editing = editing,
             hidden = panels.isHidden(destination),
             canHide = panels.canHide(destination),
             horizontal = horizontal,
             drag = drag,
-            onSelect = { onSelect(destination) },
+            onSelect = { onSelect(destination.route) },
             onEdit = onEdit,
             onToggleHidden = { hidden -> onToggleHidden(destination.key, hidden) },
             onMove = onMove,
@@ -144,7 +143,8 @@ fun PanelEditDone(onDone: () -> Unit) {
  * Whether [type] lays its items along the bottom of the window rather than down its side.
  *
  * The library's own `isNavigationBar` is private and NavigationSuiteType is a value class with no
- * `values()`, so this is re-derived by comparison against the three bar values.
+ * `values()`, so this is re-derived by comparison against the three bar values. Public so that
+ * a host and this file cannot come to different answers about the same window.
  */
 fun isHorizontal(type: NavigationSuiteType): Boolean =
     type == NavigationSuiteType.ShortNavigationBarCompact ||
@@ -153,6 +153,11 @@ fun isHorizontal(type: NavigationSuiteType): Boolean =
 
 /**
  * One panel: the container's item, and in edit mode the badge and the drag over the top of it.
+ *
+ * The Box is the slot the container measured, so everything that has to move the whole item —
+ * [zIndex], the drag offset, the lift — goes on it, and everything that describes the panel itself
+ * goes on the item inside it. The badge is a later sibling than the item so that it wins the hit
+ * test over the item's own click.
  */
 @Composable
 private fun PanelItem(
@@ -177,9 +182,18 @@ private fun PanelItem(
     val moveLater = stringResource(R.string.panels_move_later)
 
     val dragged = drag.from == index
+    // Both are kept as State and read inside the placement and layer lambdas below rather than
+    // unwrapped here, so an animation frame re-places the item instead of recomposing it. LogPan
+    // keeps its pan offset the same way and for the same reason.
     val lift = animateFloatAsState(if (dragged) DRAG_LIFT else 1f, label = "panelLift")
+    // Only the items the dragged one has crossed animate; the dragged one follows the finger
+    // exactly, which is the whole difference between carrying something and nudging it.
     val shift = animateFloatAsState(drag.displacement(index), label = "panelShift")
 
+    // Two detectors on one node would fight — a drag detector swallows the long press it starts
+    // from — so the item runs exactly one of them, chosen by what it is currently for. Both are
+    // keyed on everything they close over, since a pointerInput block captures its lambda at its
+    // keys and a stale capture is how a drag ends up reordering the index it began at yesterday.
     val slotGesture =
         if (editing) {
             Modifier.pointerInput(drag, index, horizontal, editing) {
@@ -216,6 +230,9 @@ private fun PanelItem(
     Box(
         modifier =
             Modifier.zIndex(if (dragged) 1f else 0f)
+                // Ahead of the offset below it on purpose: an outer modifier is placed by the
+                // container and an inner one by it, so what is recorded here is the slot the bar
+                // or the rail assigned rather than wherever the finger has since dragged the item.
                 .then(
                     if (!editing) Modifier
                     else
@@ -224,6 +241,9 @@ private fun PanelItem(
                             drag.reportSlot(index, if (horizontal) position.x else position.y)
                         }
                 )
+                // absoluteOffset rather than offset: the displacements are computed from recorded
+                // positions and from a raw drag delta, both of which count pixels rightwards, and
+                // the mirroring `offset` applies in an RTL locale would undo exactly one of them.
                 .absoluteOffset {
                     val along = if (drag.from == index) drag.offset else shift.value
                     if (horizontal) IntOffset(along.roundToInt(), 0)
@@ -238,6 +258,8 @@ private fun PanelItem(
     ) {
         val itemSemantics =
             if (editing) {
+                // A drag is unreachable by touch exploration, so the two moves it can make are
+                // also offered as actions on the item a screen reader is already focused on.
                 Modifier.semantics {
                     val moves = mutableListOf<CustomAccessibilityAction>()
                     if (index > 0) {
@@ -257,6 +279,10 @@ private fun PanelItem(
                     customActions = moves
                 }
             } else {
+                // Declared rather than detected: the gesture above resolves the long press on the
+                // pointer, which touch exploration never delivers. Nothing on Android teaches
+                // long-press on a navigation bar anyway, so this label is the only place a screen
+                // reader is told the gesture exists at all.
                 Modifier.semantics {
                     onLongClick(label = rearrange) {
                         onEdit()
@@ -265,6 +291,10 @@ private fun PanelItem(
                 }
             }
         val itemModifier =
+            // The bar hands its slot a fixed size, and before this Box stood between them the item
+            // received that size directly; filling it back up keeps the whole slot tappable rather
+            // than only the icon and label in the middle of it. The rail measures loosely and gets
+            // no such modifier — filling there would stretch one item down the whole rail.
             (if (horizontal) Modifier.fillMaxSize() else Modifier)
                 .graphicsLayer { alpha = if (hidden) HIDDEN_ALPHA else 1f }
                 .then(itemSemantics)
@@ -273,6 +303,9 @@ private fun PanelItem(
         val glyph = if (selected) destination.selectedIcon else destination.icon
         val icon: @Composable () -> Unit = { Icon(glyph, contentDescription = null) }
         val label: @Composable () -> Unit = { Text(name) }
+        // Nothing to select while rearranging: a tap in edit mode is either the badge or the start
+        // of a drag, and moving to another panel underneath the arrangement being edited is not
+        // something anyone asked for.
         val onClick: () -> Unit = { if (!editing) onSelect() }
 
         if (horizontal) {
@@ -289,6 +322,8 @@ private fun PanelItem(
                 onClick = onClick,
                 icon = icon,
                 label = label,
+                // The suite keeps its rail collapsed; an expanded item here would lay its label
+                // beside the icon in a rail that is not wide enough for it.
                 railExpanded = false,
                 modifier = itemModifier,
             )
@@ -307,7 +342,14 @@ private fun PanelItem(
     }
 }
 
-/** The minus or plus at the corner of a panel being rearranged. */
+/**
+ * The minus or plus at the corner of a panel being rearranged.
+ *
+ * Drawn at eighteen points and hit at twenty-four: it has to read as a mark on the item rather than
+ * as a second button beside it, and at 360dp a slot is around ninety wide, so the target it
+ * needs costs nothing. It is offered only where it does something — [NavPanels.canHide] answers
+ * that — because a badge that refuses is worse than no badge.
+ */
 @Composable
 private fun BoxScope.PanelBadge(hidden: Boolean, name: String, onClick: () -> Unit) {
     val description =
@@ -333,6 +375,7 @@ private fun BoxScope.PanelBadge(hidden: Boolean, name: String, onClick: () -> Un
             shape = CircleShape,
             color = container,
             contentColor = content,
+            // Enough to lift it off the icon underneath without reading as a floating control.
             shadowElevation = 2.dp,
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -353,8 +396,13 @@ private fun BoxScope.PanelBadge(hidden: Boolean, name: String, onClick: () -> Un
  * its own `selectable`, which is the nearer node and therefore handles the release first, so a long
  * press on Logs would open edit mode *and* switch to Logs. Watching the pointer on
  * [PointerEventPass.Initial] gets ahead of it: nothing is consumed while the press might still turn
- * out to be a tap, and everything from the moment the press has been held long enough is consumed,
- * which cancels the click that would otherwise land on the way up.
+ * out to be a tap — in which case the item's own click handles it, ripple and indicator and all —
+ * and everything from the moment the press has been held long enough is consumed, which is what
+ * cancels the click that would otherwise land on the way up.
+ *
+ * Timing it out by hand rather than through foundation's own `waitForLongPress`: that one takes the
+ * pass to watch, which is exactly what is wanted here, but it and its `LongPressResult` are
+ * `internal` — public in the bytecode, invisible to Kotlin.
  */
 private suspend fun PointerInputScope.awaitPanelLongPress(onLongPress: () -> Unit) {
     awaitEachGesture {
@@ -363,6 +411,7 @@ private suspend fun PointerInputScope.awaitPanelLongPress(onLongPress: () -> Uni
             withTimeout(viewConfiguration.longPressTimeoutMillis) {
                 waitForUpOrCancellation(PointerEventPass.Initial)
             }
+            // Let go, or taken over by something else, before the press became a hold.
             return@awaitEachGesture
         } catch (_: PointerEventTimeoutCancellationException) {
             onLongPress()
@@ -380,25 +429,43 @@ private suspend fun PointerInputScope.awaitPanelLongPress(onLongPress: () -> Uni
  *
  * The axis never appears here. [PanelBar] hands over the one number that differs between a bottom
  * bar and a rail — where each slot sits along whichever direction the container runs in — so the
- * arithmetic below is written once and both layouts get the same behaviour.
+ * arithmetic below is written once and both layouts get the same behaviour rather than two
+ * implementations that drift.
+ *
+ * Slot positions rather than a single pitch, because the rail spaces its items apart and the bar
+ * does not: the distance between two recorded positions is right in both, whereas an item's own
+ * measured extent is short by the gap in the rail and would leave every shift a few points behind
+ * the finger.
  */
 @Stable
 private class PanelDrag(count: Int) {
 
+    /** Which item is being carried, as an index into the displayed list, or -1 for none. */
     var from by mutableIntStateOf(-1)
         private set
 
+    /** Where it would land if the finger lifted now. */
     var to by mutableIntStateOf(-1)
         private set
 
+    /** How far it has travelled from its own slot. Read during placement, so no recomposition. */
     var offset by mutableFloatStateOf(0f)
         private set
 
+    // Deliberately not snapshot state: written from a layout callback and read from the gesture,
+    // never composed against. Observing them would invalidate the very layout pass that produced
+    // them — the same reason LogPan keeps its measured widths as plain fields.
     private val slots = FloatArray(count)
 
     private val active: Boolean
         get() = from in slots.indices
 
+    /**
+     * Record where the container placed the item at [index].
+     *
+     * Ignored while a drag is running. The items are displaced then, and reading the displacement
+     * back in as the slot table would walk the targets along under the finger.
+     */
     fun reportSlot(index: Int, position: Float) {
         if (!active && index in slots.indices) slots[index] = position
     }
@@ -409,6 +476,7 @@ private class PanelDrag(count: Int) {
         offset = 0f
     }
 
+    /** Advance by [delta] pixels along the axis. True when the target slot changed. */
     fun drag(delta: Float): Boolean {
         if (!active) return false
         offset += delta
@@ -424,6 +492,13 @@ private class PanelDrag(count: Int) {
         offset = 0f
     }
 
+    /**
+     * How far the item at [index] is pushed aside by the drag in flight, in pixels along the axis.
+     *
+     * Every item the dragged one has crossed moves into the slot next to its own, and does so by
+     * the real distance between those two slots rather than by an assumed pitch, so an uneven
+     * arrangement lands as exactly as an even one.
+     */
     fun displacement(index: Int): Float {
         if (!active || index == from) return 0f
         return when {

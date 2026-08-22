@@ -89,11 +89,14 @@ import java.util.Date
 import kotlinx.coroutines.launch
 import org.matrix.vector.manager.ui.theme.LocalizedOverlay
 import org.matrix.vector.manager.R
-import org.matrix.vector.manager.ui.theme.currentLocale
+import org.matrix.vector.manager.ui.theme.CROWDIN_URL
+import org.matrix.vector.manager.ui.theme.VectorLocaleController
+import org.matrix.vector.ui.locale.LanguageSheet
+import org.matrix.vector.ui.locale.currentLocale
 import org.matrix.vector.manager.di.ServiceLocator
-import org.matrix.vector.manager.ui.components.VectorAlertDialog
-import org.matrix.vector.manager.ui.components.VectorSnackbarHost
-import org.matrix.vector.manager.ui.components.show
+import org.matrix.vector.ui.SharedAlertDialog
+import org.matrix.vector.ui.SharedSnackbarHost
+import org.matrix.vector.ui.show
 import org.matrix.vector.manager.data.github.CommunityFeed
 import org.matrix.vector.manager.data.github.FeedItem
 import org.matrix.vector.manager.data.github.FeedLayout
@@ -116,7 +119,7 @@ import org.matrix.vector.ui.StatusHeader
 import org.matrix.vector.ui.ambience.AmbienceKind
 import org.matrix.vector.manager.ui.screens.splash.WingedVictory
 import org.matrix.vector.ui.RepoStatsRow
-import org.matrix.vector.manager.ui.theme.VectorMono
+import org.matrix.vector.ui.theme.Mono
 
 /**
  * Home is the front page of the *project*, not only of the app.
@@ -227,7 +230,7 @@ fun HomeScreen(
         // up behind three-button navigation. Already-consumed insets are excluded from this, so it
         // still adds nothing in the arrangements where a container is there.
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Bottom),
-        snackbarHost = { VectorSnackbarHost(snackbars) },
+        snackbarHost = { SharedSnackbarHost(snackbars) },
     ) { padding ->
         val listState = rememberLazyListState()
         var headerHeightPx by remember { mutableIntStateOf(0) }
@@ -371,7 +374,12 @@ fun HomeScreen(
     }
 
     if (showLanguage) {
-        LanguageSheet(onOpen = ::open, onDismiss = { showLanguage = false })
+        LanguageSheet(
+            controller = VectorLocaleController,
+            onDismiss = { showLanguage = false },
+            onHelpTranslate = { open(CROWDIN_URL) },
+            onOpenUrl = ::open,
+        )
     }
 
     if (showAppearance) {
@@ -457,7 +465,7 @@ private fun LauncherPrompt(
     onNever: () -> Unit,
     onLater: () -> Unit,
 ) {
-    VectorAlertDialog(
+    SharedAlertDialog(
         onDismissRequest = onLater,
         icon = { Icon(Icons.AutoMirrored.Rounded.AddToHomeScreen, contentDescription = null) },
         title = { Text(stringResource(R.string.launcher_prompt_title)) },
@@ -949,7 +957,7 @@ private fun ContributorRow(
                 )
                 Text(
                     text = person.commits.toString(),
-                    style = VectorMono,
+                    style = Mono,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

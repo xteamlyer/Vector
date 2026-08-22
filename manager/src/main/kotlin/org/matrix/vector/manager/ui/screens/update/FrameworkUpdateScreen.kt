@@ -4,7 +4,7 @@ import org.matrix.vector.ui.R as UiR
 import org.matrix.vector.manager.data.repository.FrameworkUpdateState
 import org.matrix.vector.manager.data.repository.divergesFrom
 import androidx.compose.foundation.clickable
-import org.matrix.vector.manager.ui.theme.currentLocale
+import org.matrix.vector.ui.locale.currentLocale
 import org.matrix.vector.manager.ui.theme.LocalizedOverlay
 import org.matrix.vector.ui.SheetHeading
 import org.matrix.vector.ui.sheetRowColors
@@ -86,7 +86,7 @@ import org.matrix.vector.ui.store.releaseMarkdownToHtml
 import org.matrix.vector.manager.di.ServiceLocator
 import org.matrix.vector.manager.ui.screens.web.fetchStoreSubresource
 import org.matrix.vector.manager.ui.screens.web.forWebView
-import org.matrix.vector.manager.ui.theme.VectorLogLine
+import org.matrix.vector.ui.theme.LogLine
 
 /**
  * What is in the update, and what happened when it was installed.
@@ -291,7 +291,7 @@ private fun InstallLog(lines: List<String>, terminal: Boolean) {
         items(lines) { line ->
             Text(
                 text = line,
-                style = VectorLogLine,
+                style = LogLine,
                 color = MaterialTheme.colorScheme.onSurface,
                 // Installers print progress bars and paths that are wider than any phone; wrapping
                 // them turns one line of output into four and makes the log unreadable.

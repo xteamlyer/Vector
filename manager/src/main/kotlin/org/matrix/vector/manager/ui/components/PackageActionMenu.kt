@@ -1,5 +1,8 @@
 package org.matrix.vector.manager.ui.components
 
+import org.matrix.vector.ui.AppIcon
+import org.matrix.vector.ui.SnackbarTone
+import org.matrix.vector.ui.SharedAlertDialog
 import org.matrix.vector.ui.R as UiR
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -66,7 +69,7 @@ import androidx.compose.material3.TextButton
 import org.matrix.vector.manager.ui.screens.modules.ScopeViewModel
 import org.matrix.vector.manager.ui.screens.modules.ScopeViewModel.Companion.SYSTEM_FRAMEWORK_PACKAGE
 import org.matrix.vector.manager.di.ServiceLocator
-import org.matrix.vector.manager.ui.theme.VectorMono
+import org.matrix.vector.ui.theme.Mono
 
 /** What a long press did, and how it went. */
 data class PackageActionResult(
@@ -142,7 +145,7 @@ fun PackageActionSheet(
     val daemon = ServiceLocator.daemon
 
     if (confirmSoftReboot) {
-        VectorAlertDialog(
+        SharedAlertDialog(
             onDismissRequest = { confirmSoftReboot = false },
             icon = { Icon(Icons.Rounded.RestartAlt, contentDescription = null) },
             title = { Text(stringResource(R.string.action_soft_reboot)) },
@@ -205,7 +208,7 @@ LocalizedOverlay {
                 )
                 Text(
                     text = ScopeViewModel.displayPackageName(packageName),
-                    style = VectorMono,
+                    style = Mono,
                     color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

@@ -450,87 +450,115 @@ class ScopeViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
 
-            // Only the apps belonging to the user this module is installed for. A module in a
-            // work profile can only hook that profile's apps, so listing the owner's alongside
-            // them offers choices the framework will not honour — and the same package appears
-            // once per user, so an unfiltered list shows visible duplicates.
-            val apps =
-                withContext(Dispatchers.IO) {
-                    appRepository.getInstalledApps().filter { it.userId == userId }
-                }
+            // `loading` starts true and the state built at the end of this body is the only
+            // other writer of it, so any exit that skips that line leaves the spinner up for
+            // good: a throw from one of the reads below, or the screen being left while they
+            // are still running. Issue #917 was that window held open for minutes by a cold
+            // app list, and nothing about it on screen could be told from a permanent hang.
+            try {
+                // Only the apps belonging to the user this module is installed for. A module in a
+                // work profile can only hook that profile's apps, so listing the owner's alongside
+                // them offers choices the framework will not honour — and the same package appears
+                // once per user, so an unfiltered list shows visible duplicates.
+                val apps =
+                    withContext(Dispatchers.IO) {
+                        appRepository.getInstalledApps().filter { it.userId == userId }
+                    }
 
-            // The system server is a hook target like any other and modules ask for it by name,
-            // but it is not an installed package so it never appears in the package list. Without
-            // this entry a module whose entire recommended scope is the framework — Core Patch,
-            // for one — offers the user nothing to tick.
-            //
-            // Offered to every user, not only the owner. There is exactly one system_server on the
-            // device, so it is not a per-user target that other users happen to lack — it is one
-            // process they all share, and a module in a work profile or a private space would
-            // otherwise have no way to ask for the only target it may need (issue #136). The
-            // daemon agrees: `ModuleDatabase.setModuleScope` stores a `system` row under user 0
-            // whoever asked, and `ConfigCache` maps it to system_server without looking at whose
-            // module it was.
-            val withFramework = listOf(systemFrameworkEntry(apps)) + apps
-            allApps.value = withFramework
+                // The system server is a hook target like any other and modules ask for it by name,
+                // but it is not an installed package so it never appears in the package list.
+                // Without this entry a module whose entire recommended scope is the framework —
+                // Core Patch, for one — offers the user nothing to tick.
+                //
+                // Offered to every user, not only the owner. There is exactly one system_server on
+                // the device, so it is not a per-user target that other users happen to lack — it
+                // is one process they all share, and a module in a work profile or a private space
+                // would otherwise have no way to ask for the only target it may need (issue #136).
+                // The daemon agrees: `ModuleDatabase.setModuleScope` stores a `system` row under
+                // user 0 whoever asked, and `ConfigCache` maps it to system_server without looking
+                // at whose module it was.
+                val withFramework = listOf(systemFrameworkEntry(apps)) + apps
+                allApps.value = withFramework
 
-            // Asked once per load rather than per row, and held here until the state is built at
-            // the end of this function — anything written into `_uiState` before then is discarded
-            // when that fresh ScopeUiState replaces it. A failure to ask means not explaining,
-            // never explaining wrongly.
-            val userCount =
-                withContext(Dispatchers.IO) { daemonClient.getUsers().getOrNull()?.size ?: 1 }
+                // Asked once per load rather than per row, and held here until the state is built
+                // at the end of this function — anything written into `_uiState` before then is
+                // discarded when that fresh ScopeUiState replaces it. A failure to ask means not
+                // explaining, never explaining wrongly.
+                val userCount =
+                    withContext(Dispatchers.IO) { daemonClient.getUsers().getOrNull()?.size ?: 1 }
 
-            // A scope the daemon will not hand over shows as none rather than keeping the screen
-            // shut; [readSavedScope] logs why, and keeps that case apart from the empty list a
-            // module with nothing ticked legitimately has.
-            val saved = readSavedScope() ?: emptySet()
-            savedScope.value = saved
-            draftScope.value = saved
+                // A scope the daemon will not hand over shows as none rather than keeping the
+                // screen shut; [readSavedScope] logs why, and keeps that case apart from the empty
+                // list a module with nothing ticked legitimately has.
+                val saved = readSavedScope() ?: emptySet()
+                savedScope.value = saved
+                draftScope.value = saved
 
-            val info =
-                withContext(Dispatchers.IO) {
-                    runCatching {
-                            packageManager.getApplicationInfo(
-                                modulePackageName,
-                                android.content.pm.PackageManager.GET_META_DATA,
-                            )
+                val info =
+                    withContext(Dispatchers.IO) {
+                        runCatching {
+                                packageManager.getApplicationInfo(
+                                    modulePackageName,
+                                    android.content.pm.PackageManager.GET_META_DATA,
+                                )
+                            }
+                            .onFailure { e ->
+                                logW(
+                                    "scope: package info for $modulePackageName (user $userId) " +
+                                        "unavailable, no recommended scope",
+                                    e,
+                                )
+                            }
+                            .getOrNull()
+                    }
+                // One inspection, two answers: what the module asks to hook, and which generation
+                // of module it is. Both come out of the same pass over the APK, and opening it is
+                // the expensive part.
+                val manifest =
+                    info?.let {
+                        withContext(Dispatchers.IO) {
+                            // Guarded like the package info above it, and for the same reason: this
+                            // opens the module's APK, so a package removed or replaced between that
+                            // lookup and this one throws here. Recovering as "no recommended scope"
+                            // costs the reader a few pre-ticked rows; letting it out of a
+                            // `viewModelScope` coroutine takes the whole manager down.
+                            runCatching { ModuleDetection.inspect(it, packageManager) }
+                                .onFailure { e ->
+                                    logW(
+                                        "scope: reading the manifest of $modulePackageName " +
+                                            "failed, no recommended scope",
+                                        e,
+                                    )
+                                }
+                                .getOrNull()
                         }
-                        .onFailure { e ->
-                            logW(
-                                "scope: package info for $modulePackageName (user $userId) " +
-                                    "unavailable, no recommended scope",
-                                e,
-                            )
-                        }
-                        .getOrNull()
-                }
-            // One inspection, two answers: what the module asks to hook, and which generation of
-            // module it is. Both come out of the same pass over the APK, and opening it is the
-            // expensive part.
-            val manifest =
-                info?.let {
-                    withContext(Dispatchers.IO) { ModuleDetection.inspect(it, packageManager) }
-                }
-            val recommended =
-                manifest?.let { RecommendedScope(it.scope, it.staticScope) } ?: RecommendedScope.NONE
+                    }
+                val recommended =
+                    manifest?.let { RecommendedScope(it.scope, it.staticScope) }
+                        ?: RecommendedScope.NONE
 
-            _uiState.value =
-                ScopeUiState(
-                    moduleName =
-                        info?.loadLabel(packageManager)?.toString() ?: modulePackageName,
-                    isEnabled = modulePackageName in moduleRepository.enabledModulesState.value,
-                    includeNewApps =
-                        daemonClient.getIncludeNewApps(modulePackageName).getOrDefault(false),
-                    recommended = recommended,
-                    loading = false,
-                    multipleUsers = userCount > 1,
-                    // The manager's own reading of the APK, not the daemon's. The daemon settles
-                    // this while it loads the module and never tells anyone — and it only holds an
-                    // answer for a module that is enabled, which is precisely not the state a
-                    // module is in while its scope is being chosen for the first time.
-                    selfHooked = manifest?.isLegacy == true,
-                )
+                _uiState.value =
+                    ScopeUiState(
+                        moduleName =
+                            info?.loadLabel(packageManager)?.toString() ?: modulePackageName,
+                        isEnabled = modulePackageName in moduleRepository.enabledModulesState.value,
+                        includeNewApps =
+                            daemonClient.getIncludeNewApps(modulePackageName).getOrDefault(false),
+                        recommended = recommended,
+                        loading = false,
+                        multipleUsers = userCount > 1,
+                        // The manager's own reading of the APK, not the daemon's. The daemon
+                        // settles this while it loads the module and never tells anyone — and it
+                        // only holds an answer for a module that is enabled, which is precisely not
+                        // the state a module is in while its scope is being chosen for the first
+                        // time.
+                        selfHooked = manifest?.isLegacy == true,
+                    )
+            } finally {
+                if (_uiState.value.loading) {
+                    _uiState.value = _uiState.value.copy(loading = false)
+                }
+            }
         }
     }
 

@@ -46,9 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import java.util.Calendar
 import org.matrix.vector.manager.R
-import org.matrix.vector.manager.ui.theme.currentLocale
+import org.matrix.vector.ui.locale.currentLocale
 import org.matrix.vector.manager.data.github.TimelineCommit
-import org.matrix.vector.manager.ui.theme.VectorMono
+import org.matrix.vector.ui.theme.Mono
 
 /**
  * One row of the commit rail.
@@ -97,8 +97,8 @@ fun CommitRow(
 
             val badgeSize =
                 remember(commit.shortSha, prLabel, density) {
-                    val sha = measurer.measure(commit.shortSha, VectorMono).size
-                    val pr = prLabel?.let { measurer.measure(it, VectorMono).size }
+                    val sha = measurer.measure(commit.shortSha, Mono).size
+                    val pr = prLabel?.let { measurer.measure(it, Mono).size }
                     // Slack over the measured text: one chip's horizontal padding and border,
                     // per chip, plus the gap between them.
                     val pad = with(density) { CHIP_PADDING.roundToPx() }
@@ -142,7 +142,7 @@ fun CommitRow(
                                 ) {
                                     Text(
                                         commit.shortSha,
-                                        style = VectorMono,
+                                        style = Mono,
                                         color = colors.onSurfaceVariant,
                                     )
                                 }
@@ -164,7 +164,7 @@ fun CommitRow(
                                                 .padding(horizontal = CHIP_PADDING),
                                         contentAlignment = Alignment.Center,
                                     ) {
-                                        Text(prLabel, style = VectorMono, color = colors.primary)
+                                        Text(prLabel, style = Mono, color = colors.primary)
                                     }
                                 }
                             }
@@ -387,7 +387,7 @@ fun InstalledMarkerRow(
         Spacer(Modifier.width(8.dp))
         Text(
             text = stringResource(R.string.home_your_build, versionCode),
-            style = VectorMono,
+            style = Mono,
             color = colors.onSurfaceVariant,
         )
         Spacer(Modifier.width(8.dp))

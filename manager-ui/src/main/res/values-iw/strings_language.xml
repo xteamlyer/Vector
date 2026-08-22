@@ -5,4 +5,5 @@
     <string name="language_system_summary">לפי השפה שמוגדרת בטלפון</string>
     <string name="language_help">עזרה בתרגום</string>
     <string name="language_help_short">תרגום</string>
+    <string name="language_translated_by">תורגם על ידי %1$s</string>
 </resources>

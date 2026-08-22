@@ -55,6 +55,10 @@ files:
     translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
     type: android
     languages_mapping: *resource_folders
+  - source: /manager-ui/src/main/res/values/strings_network.xml
+    translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
+    type: android
+    languages_mapping: *resource_folders
   - source: /manager-ui/src/main/res/values/strings_store.xml
     translation: /manager-ui/src/main/res/values-%two_letters_code%/%original_file_name%
     type: android

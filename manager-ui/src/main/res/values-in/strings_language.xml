@@ -5,4 +5,5 @@
     <string name="language_system_summary">Ikuti bahasa yang disetel di ponsel</string>
     <string name="language_help">Bantu menerjemahkan</string>
     <string name="language_help_short">Terjemahkan</string>
+    <string name="language_translated_by">Diterjemahkan oleh %1$s</string>
 </resources>

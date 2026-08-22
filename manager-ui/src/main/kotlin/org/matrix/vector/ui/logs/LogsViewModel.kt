@@ -8,7 +8,9 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -79,6 +81,8 @@ data class LogPaneState(
     val droppedLeading: Int = 0,
     val query: LogQuery = LogQuery(),
     val facets: LogFacets? = null,
+    /** A name for each writer the facets offer, resolved with them and off the main thread. */
+    val writerNames: Map<Int, String> = emptyMap(),
     val refreshing: Boolean = false,
     val scroll: ScrollCommand? = null,
     /** Rotated parts the host holds, oldest first. The last one is the live file. */
@@ -482,8 +486,15 @@ class LogsViewModel(private val source: LogSource) : ViewModel() {
             it.copy(levels = if (level in it.levels) it.levels - level else it.levels + level)
         }
 
-    fun setTag(tab: LogTab, tag: String?) =
-        updateQuery(tab, debounce = false) { it.copy(tag = if (it.tag == tag) null else tag) }
+    fun toggleWriter(tab: LogTab, uid: Int) =
+        updateQuery(tab, debounce = false) {
+            it.copy(uids = if (uid in it.uids) it.uids - uid else it.uids + uid)
+        }
+
+    fun toggleTag(tab: LogTab, tag: String) =
+        updateQuery(tab, debounce = false) {
+            it.copy(tags = if (tag in it.tags) it.tags - tag else it.tags + tag)
+        }
 
     fun clearFilter(tab: LogTab) = updateQuery(tab, debounce = false) { LogQuery() }
 
@@ -542,7 +553,11 @@ class LogsViewModel(private val source: LogSource) : ViewModel() {
 
         pane.matches = scan.matches
         val count = scan.matches?.size ?: index.lineCount
-        pane.state.update { it.copy(facets = scan.facets, visibleLines = count) }
+        // Named here, on the scan's own dispatcher: a host resolves a uid through the package
+        // manager, and asking it once per chip while the filter sheet animates in would put those
+        // round trips on the main thread.
+        val names = scan.facets.writers.mapNotNull { w -> source.writerLabel(w.uid)?.let { w.uid to it } }.toMap()
+        pane.state.update { it.copy(facets = scan.facets, writerNames = names, visibleLines = count) }
 
         if (count == 0) {
             pane.first = 0
@@ -645,6 +660,14 @@ class LogsViewModel(private val source: LogSource) : ViewModel() {
 
         /** How close to an edge the viewport gets before the window is extended. */
         private const val THRESHOLD = 60
+
+        /**
+         * How many writers are named per scan.
+         *
+         * The filter lists them by weight, so the ones past this wrote a handful of lines each. They still appear, as
+         * their uid, and are still selectable; what they no longer do is make every scan pay to name them.
+         */
+        private const val MAX_NAMED_WRITERS = 48
 
         private const val QUERY_DEBOUNCE_MS = 250L
 

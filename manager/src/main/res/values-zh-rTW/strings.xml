@@ -129,8 +129,6 @@
     <string name="settings_navigation">導覽</string>
     <string name="settings_floating_nav">懸浮導覽</string>
     <string name="settings_floating_nav_summary">用一顆可以拖到任意位置的小球取代導覽列。按住小球會將面板呈扇形展開，輕觸則讓它們保持展開。</string>
-    <string name="settings_rearrange_panels">重新排列面板</string>
-    <string name="settings_rearrange_panels_summary">調整順序，或隱藏從不開啟的面板。</string>
 
     <string name="settings_activity">動態</string>
     <plurals name="settings_window_months">
@@ -253,7 +251,6 @@
     <string name="language_system">跟隨系統</string>
     <string name="language_system_summary">使用手機設定的語言</string>
 
-    <string name="language_translated_by">翻譯：%1$s</string>
     <string name="language_help_short">翻譯</string>
     <string name="language_help">協助翻譯 Vector</string>
 
@@ -392,15 +389,6 @@
     <string name="scope_framework_restart_title">系統框架尚未套用此變更</string>
     <string name="scope_framework_restart_body">系統框架只在 Android 啟動時載入一次。此變更要等到框架重新啟動後才會生效——所有正在執行的應用程式都會關閉，手機本身保持開機。</string>
     <string name="scope_framework_restart_later">稍後</string>
-    <string name="settings_network">網路</string>
-    <string name="settings_doh">透過 HTTPS 解析網域</string>
-    <string name="settings_doh_summary">透過 Cloudflare 而非網路自帶的解析器查詢網域。適用於封鎖或竄改 DNS 的網路。</string>
-    <string name="settings_doh_untested">尚未解析任何網域。</string>
-    <string name="settings_doh_bypassed">未使用：已設定 Proxy，網域由 Proxy 解析。</string>
-    <string name="settings_doh_working">正常 — 已透過 Cloudflare 解析 %1$s。</string>
-    <string name="settings_doh_fell_back">無法連線至 Cloudflare（%1$s），本次工作階段的其餘時間將使用網路自帶的解析器。</string>
-    <string name="settings_doh_retry">重試</string>
-
     <string name="launcher_title">如何開啟 Vector</string>
     <string name="launcher_body">Vector 並未以應用程式的形式安裝，啟動器因此沒有可顯示的圖示。以下是回到它的幾種方式。</string>
     <string name="launcher_shortcut">主畫面捷徑</string>

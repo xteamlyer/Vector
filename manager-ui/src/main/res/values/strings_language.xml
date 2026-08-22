@@ -5,4 +5,5 @@
     <string name="language_system_summary">Follow the language your phone is set to</string>
     <string name="language_help">Help translate</string>
     <string name="language_help_short">Translate</string>
+    <string name="language_translated_by">Translated by %1$s</string>
 </resources>

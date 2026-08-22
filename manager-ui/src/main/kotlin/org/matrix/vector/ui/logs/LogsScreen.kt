@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.automirrored.rounded.Article
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.FilterList
@@ -97,6 +99,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.ViewModel
@@ -151,6 +154,14 @@ fun LogsScreen(
     // search boxes, two filter states and two scroll positions for what is one question — "what
     // does the log say" — whose answer often has to be looked for in both streams.
     var currentTab by rememberSaveable { mutableStateOf(LogTab.MODULES) }
+    // Read from the source rather than snapshotted in the view model: a host can gain or lose its
+    // verbose stream while the screen is open (a backend granted, a service lost), and the control
+    // has to follow. Losing it mid-read also has to move the reader back, or the pane would stay on
+    // a stream the host no longer serves.
+    val hasVerboseStream = source.hasVerboseStream
+    LaunchedEffect(hasVerboseStream) {
+        if (!hasVerboseStream && currentTab == LogTab.VERBOSE) currentTab = LogTab.MODULES
+    }
     val currentState by viewModel.state(currentTab).collectAsStateWithLifecycle()
     val wordWrap by viewModel.wordWrap.collectAsStateWithLifecycle()
     val saveState by viewModel.saveState.collectAsStateWithLifecycle()
@@ -223,6 +234,7 @@ fun LogsScreen(
                         state = currentState,
                         viewModel = viewModel,
                         onSelectTab = { currentTab = it },
+                        showSourceToggle = hasVerboseStream,
                     )
                 },
                 actions = {
@@ -386,8 +398,10 @@ private fun LogPane(
         // LogRows, which disappears while this is showing.
         ActiveFilterRow(
             state = state,
-            onClearTag = { viewModel.setTag(tab, null) },
+            onClearTag = { viewModel.toggleTag(tab, it) },
             onClearLevel = { viewModel.toggleLevel(tab, it) },
+            onClearWriter = { viewModel.toggleWriter(tab, it) },
+            writerLabel = { state.writerNames[it] ?: it.toString() },
         )
 
         if (state.droppedLeading > 0) {
@@ -511,11 +525,12 @@ private fun LogList(
                         LogRowItem(
                             row = row,
                             wordWrap = wordWrap,
-                            showTag = state.query.tag == null,
+                            // Redundant only when every row on screen carries the same tag.
+                            showTag = state.query.tags.size != 1,
                             pan = pan,
                             query = state.query.text,
                             inlineTraces = inlineTraces,
-                            onTagClick = { viewModel.setTag(tab, it) },
+                            onTagClick = { viewModel.toggleTag(tab, it) },
                             onCopy = onCopy,
                             onOpenTrace = onOpenTrace,
                         )
@@ -560,6 +575,7 @@ private fun LogSearch(
     state: LogPaneState,
     viewModel: LogsViewModel,
     onSelectTab: (LogTab) -> Unit,
+    showSourceToggle: Boolean,
 ) {
     var filterOpen by remember { mutableStateOf(false) }
     SearchField(
@@ -567,7 +583,7 @@ private fun LogSearch(
         onQueryChange = { viewModel.setQuery(tab, it) },
         placeholder = stringResource(R.string.logs_search_hint),
         trailing = {
-            LogSourceToggle(tab = tab, onSelect = onSelectTab)
+            if (showSourceToggle) LogSourceToggle(tab = tab, onSelect = onSelectTab)
             IconButton(
                 onClick = {
                     filterOpen = true
@@ -578,7 +594,11 @@ private fun LogSearch(
                     Icons.Rounded.FilterList,
                     contentDescription = stringResource(R.string.logs_filter),
                     tint =
-                        if (state.query.levels.isNotEmpty() || state.query.tag != null)
+                        if (
+                            state.query.levels.isNotEmpty() ||
+                                state.query.uids.isNotEmpty() ||
+                                state.query.tags.isNotEmpty()
+                        )
                             MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -590,7 +610,9 @@ private fun LogSearch(
             state = state,
             onDismiss = { filterOpen = false },
             onToggleLevel = { viewModel.toggleLevel(tab, it) },
-            onTag = { viewModel.setTag(tab, it) },
+            onToggleWriter = { viewModel.toggleWriter(tab, it) },
+            writerLabel = { state.writerNames[it] ?: it.toString() },
+            onToggleTag = { viewModel.toggleTag(tab, it) },
             onClear = { viewModel.clearFilter(tab) },
         )
     }
@@ -631,11 +653,12 @@ private fun LogSourceToggle(tab: LogTab, onSelect: (LogTab) -> Unit) {
 @Composable
 private fun ActiveFilterRow(
     state: LogPaneState,
-    onClearTag: () -> Unit,
+    onClearTag: (String) -> Unit,
     onClearLevel: (LogLevel) -> Unit,
+    onClearWriter: (Int) -> Unit,
+    writerLabel: (Int) -> String,
 ) {
-    val tag = state.query.tag
-    if (tag == null && state.query.levels.isEmpty()) return
+    if (state.query.tags.isEmpty() && state.query.levels.isEmpty() && state.query.uids.isEmpty()) return
 
     Row(
         modifier =
@@ -645,10 +668,10 @@ private fun ActiveFilterRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (tag != null) {
+        state.query.tags.sorted().forEach { tag ->
             InputChip(
                 selected = true,
-                onClick = onClearTag,
+                onClick = { onClearTag(tag) },
                 label = { Text(tag, style = Mono, maxLines = 1) },
                 avatar = {
                     Icon(
@@ -661,6 +684,31 @@ private fun ActiveFilterRow(
                     Icon(
                         Icons.Rounded.Close,
                         contentDescription = stringResource(R.string.logs_filter_clear_tag),
+                        modifier = Modifier.size(16.dp),
+                    )
+                },
+            )
+        }
+        // Its own avatar, not the tag's: these chips sit side by side and say different things, so
+        // wearing the same mark would leave the row reading as a list of tags, one of which is an
+        // application.
+        state.query.uids.sorted().forEach { uid ->
+            val label = writerLabel(uid)
+            InputChip(
+                selected = true,
+                onClick = { onClearWriter(uid) },
+                label = { Text(label, maxLines = 1) },
+                avatar = {
+                    Icon(
+                        Icons.Rounded.Apps,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        Icons.Rounded.Close,
+                        contentDescription = stringResource(R.string.logs_filter_clear_writer),
                         modifier = Modifier.size(16.dp),
                     )
                 },
@@ -941,7 +989,9 @@ private fun LogFilterSheet(
     state: LogPaneState,
     onDismiss: () -> Unit,
     onToggleLevel: (LogLevel) -> Unit,
-    onTag: (String?) -> Unit,
+    onToggleWriter: (Int) -> Unit,
+    writerLabel: (Int) -> String,
+    onToggleTag: (String) -> Unit,
     onClear: () -> Unit,
 ) {
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
@@ -971,9 +1021,53 @@ private fun LogFilterSheet(
                         FilterChip(
                             selected = level in state.query.levels,
                             onClick = { onToggleLevel(level) },
-                            enabled = state.facets == null || count > 0,
+                            // A chosen level stays clickable even at zero: the other facets can
+                            // count it out, and a chip that cannot be pressed cannot be unset.
+                            enabled = state.facets == null || count > 0 || level in state.query.levels,
                             label = { Text(level.char.toString(), style = Mono) },
                         )
+                    }
+                }
+
+                // Whoever wrote the line, where the host can say. Chips like the levels rather than
+                // a single choice like the tags: reading two applications against each other is the
+                // ordinary case, and each one is switched off the way it was switched on.
+                // Counted under the other categories, so this lists what the rest of the filter
+                // leaves available -- with one exception: a chosen chip stays whatever its count,
+                // since a filter the reader set has to remain visible to be unset.
+                val writers =
+                    state.facets?.writers.orEmpty().filter {
+                        it.count > 0 || it.uid in state.query.uids
+                    }
+                if (writers.isNotEmpty()) {
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        stringResource(R.string.logs_filter_writers),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        writers.forEach { writer ->
+                            FilterChip(
+                                selected = writer.uid in state.query.uids,
+                                onClick = { onToggleWriter(writer.uid) },
+                                label = {
+                                    // The count is the half that must survive a long name, so the
+                                    // name is what gives way: a chip is one line tall and a wrapped
+                                    // label would push the number out of it.
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            writerLabel(writer.uid),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.weight(1f, fill = false),
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(writer.count.toString(), style = Mono)
+                                    }
+                                },
+                            )
+                        }
                     }
                 }
 
@@ -991,15 +1085,25 @@ private fun LogFilterSheet(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
-                    LazyColumn(modifier = Modifier.height(280.dp)) {
-                        items(facets.tags, key = { it.first }) { (tag, count) ->
+                    val tags = facets.tags.filter { it.second > 0 || it.first in state.query.tags }
+                    if (tags.isEmpty()) {
+                        // The rest of the filter can leave no tag at all, and a fixed-height list
+                        // would answer that with 280dp of nothing.
+                        Text(
+                            stringResource(R.string.logs_filter_none),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    LazyColumn(modifier = Modifier.height(if (tags.isEmpty()) 0.dp else 280.dp)) {
+                        items(tags, key = { it.first }) { (tag, count) ->
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 FilterChip(
-                                    selected = state.query.tag == tag,
-                                    onClick = { onTag(tag) },
+                                    selected = tag in state.query.tags,
+                                    onClick = { onToggleTag(tag) },
                                     label = { Text(tag, style = Mono) },
                                 )
                                 Spacer(Modifier.width(10.dp))

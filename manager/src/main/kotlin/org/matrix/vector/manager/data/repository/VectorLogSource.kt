@@ -9,6 +9,7 @@ import org.matrix.vector.manager.di.ServiceLocator
 import org.matrix.vector.ui.logs.LogContent
 import org.matrix.vector.ui.logs.LogResetKind
 import org.matrix.vector.ui.logs.LogSource
+import org.matrix.vector.ui.logs.WriterLabeler
 
 /**
  * Vector's daemon-backed implementation of the shared Logs screen's [LogSource].
@@ -23,6 +24,10 @@ class VectorLogSource : LogSource {
 
     private val daemon = ServiceLocator.daemon
     private val settings = ServiceLocator.settings
+
+    private val writers = WriterLabeler(ServiceLocator.context.packageManager)
+
+    override fun writerLabel(uid: Int): String? = writers.label(uid)
 
     override suspend fun parts(verbose: Boolean): List<String> =
         daemon.getLogParts(verbose).getOrDefault(emptyList())

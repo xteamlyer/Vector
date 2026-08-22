@@ -1,5 +1,6 @@
-package org.matrix.vector.manager.net
+package org.matrix.vector.ui.net
 
+import android.util.Log
 import java.net.InetAddress
 import java.net.Proxy
 import java.net.ProxySelector
@@ -11,8 +12,23 @@ import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
-import org.matrix.vector.manager.data.repository.SettingsRepository
-import org.matrix.vector.manager.logW
+
+private const val TAG = "VectorDns"
+
+/**
+ * The DoH preference, read by the resolver and written by the settings UI.
+ *
+ * Each host (Vector's SettingsRepository, LSPatch's LSPSettings) implements this over its own
+ * preference store, so the one resolver and the one status section work against either without
+ * depending on a concrete settings class.
+ */
+interface NetworkSettings {
+    /** Whether name lookups should try DNS over HTTPS before the system resolver. */
+    val dohEnabled: StateFlow<Boolean>
+
+    /** Turn DoH on or off. Takes effect on the next lookup — the client is never rebuilt. */
+    fun setDohEnabled(enabled: Boolean)
+}
 
 /**
  * What the last name lookup of this session actually did.
@@ -69,7 +85,7 @@ sealed interface DohStatus {
  * client would drop the connection pool and orphan the disk cache, so reading them here is what
  * lets a switch — or joining a VPN — take effect before the next process start.
  */
-class VectorDns(private val settings: SettingsRepository, bootstrapClient: OkHttpClient) : Dns {
+class VectorDns(private val settings: NetworkSettings, bootstrapClient: OkHttpClient) : Dns {
 
     private val endpoint = "https://cloudflare-dns.com/dns-query".toHttpUrl()
 
@@ -159,7 +175,8 @@ class VectorDns(private val settings: SettingsRepository, bootstrapClient: OkHtt
                 // OkHttp dispatcher thread, with no coroutine in the stack.
                 dohUnavailable = true
                 _status.value = DohStatus.FellBack(e.describe(hostname))
-                logW(
+                Log.w(
+                    TAG,
                     "dns: DoH lookup of $hostname failed, using the system resolver for this session",
                     e,
                 )

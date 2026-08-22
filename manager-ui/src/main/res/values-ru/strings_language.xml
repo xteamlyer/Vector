@@ -5,4 +5,5 @@
     <string name="language_system_summary">Использовать язык, выбранный на телефоне</string>
     <string name="language_help">Помочь с переводом</string>
     <string name="language_help_short">Перевести</string>
+    <string name="language_translated_by">Перевод: %1$s</string>
 </resources>

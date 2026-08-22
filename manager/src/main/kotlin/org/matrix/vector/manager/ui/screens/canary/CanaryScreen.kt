@@ -59,7 +59,7 @@ import org.matrix.vector.manager.data.repository.CanaryOverview
 import org.matrix.vector.manager.data.repository.CanarySpan
 import org.matrix.vector.manager.ui.components.InstalledMarkerRow
 import org.matrix.vector.manager.ui.components.exactTime
-import org.matrix.vector.manager.ui.theme.VectorMono
+import org.matrix.vector.ui.theme.Mono
 
 /**
  * Canary builds: what has landed since the reader's own build, and how to go and run it.
@@ -251,7 +251,7 @@ private fun Preamble(overview: CanaryOverview) {
             Spacer(Modifier.height(4.dp))
             overview.fixed.take(ISSUES_SHOWN).forEach { issue ->
                 Row(Modifier.fillMaxWidth().padding(top = 3.dp)) {
-                    Text("#${issue.number}", style = VectorMono, color = colors.primary)
+                    Text("#${issue.number}", style = Mono, color = colors.primary)
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = issue.title,
@@ -298,7 +298,7 @@ private fun BuildCard(span: CanarySpan, onInstall: (Long) -> Unit, onOpenUrl: (S
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.canary_build, release.versionCode),
-                style = VectorMono,
+                style = Mono,
                 color = colors.onSurface,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -416,7 +416,7 @@ private fun PullRequestSlot(number: Int?, onOpenUrl: (String) -> Unit) {
     val density = LocalDensity.current
     val width =
         remember(measurer, density) {
-            with(density) { measurer.measure(WIDEST_PR, VectorMono).size.width.toDp() } +
+            with(density) { measurer.measure(WIDEST_PR, Mono).size.width.toDp() } +
                 PR_CHIP_PADDING * 2 +
                 PR_CHIP_BORDER * 2
         }
@@ -425,7 +425,7 @@ private fun PullRequestSlot(number: Int?, onOpenUrl: (String) -> Unit) {
         if (number != null) {
             Text(
                 text = "#$number",
-                style = VectorMono,
+                style = Mono,
                 color = colors.primary,
                 maxLines = 1,
                 modifier =

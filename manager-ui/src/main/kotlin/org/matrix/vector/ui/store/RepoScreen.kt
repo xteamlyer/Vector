@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -88,6 +89,7 @@ fun RepoScreen(
     onModuleClick: (packageName: String) -> Unit,
     dataSource: StoreDataSource,
     settings: StoreSettings,
+    actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val viewModel: RepoViewModel =
         viewModel(factory = viewModelFactory { initializer { RepoViewModel(dataSource, settings) } })
@@ -107,6 +109,7 @@ fun RepoScreen(
                 catalog = catalog,
                 updates = updates,
                 search = { StoreSearch(query, viewModel, sort, priorities, channel) },
+                actions = actions,
             )
 
             Spacer(Modifier.height(4.dp))
@@ -149,10 +152,16 @@ fun RepoScreen(
 }
 
 @Composable
-private fun StoreHeader(catalog: StoreCatalog, updates: Int, search: @Composable () -> Unit) {
+private fun StoreHeader(
+    catalog: StoreCatalog,
+    updates: Int,
+    search: @Composable () -> Unit,
+    actions: (@Composable RowScope.() -> Unit)? = null,
+) {
     val context = LocalContext.current
     PanelHeader(
         title = stringResource(R.string.nav_store),
+        actions = actions,
         description = {
             if (catalog.modules.isNotEmpty()) {
                 val total =

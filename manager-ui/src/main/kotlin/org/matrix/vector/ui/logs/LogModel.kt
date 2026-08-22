@@ -63,6 +63,12 @@ sealed interface LogRow {
         val date: String,
         /** `HH:mm:ss.SSS`. The date is redundant on every row and moves to the separator. */
         val time: String,
+        /**
+         * Who wrote the line, or -1 where the format carries no uid for it.
+         *
+         * Negative rather than zero, because zero is root, and a log written by a privileged daemon is full of its
+         * lines: a sentinel sharing that value would hide them from a filter that lists writers.
+         */
         val uid: Int,
         val pid: Int,
         val tid: Int,
@@ -115,34 +121,62 @@ class LogIndex(val bounds: LongArray, val droppedLeading: Int) {
 /** What [LogContent.scan] found: the filtered line numbers, and what the file contains. */
 class LogScanResult(val matches: IntArray?, val facets: LogFacets)
 
-/** The tags and levels actually present, with counts, so the filter sheet cannot go stale. */
+/**
+ * A process the log has lines from, and how many it wrote.
+ *
+ * Counted in the host's own scanning pass, where the lines already are. Naming it is a separate question, asked of the
+ * host through [LogSource.writerLabel] only for the few uids a filter actually offers, rather than carried here for
+ * every one of them.
+ */
+data class LogWriter(val uid: Int, val count: Int)
+
+/** The tags, levels and writers actually present, with counts, so the filter sheet cannot go stale. */
 data class LogFacets(
     val tags: List<Pair<String, Int>> = emptyList(),
     val levels: Map<LogLevel, Int> = emptyMap(),
+    val writers: List<LogWriter> = emptyList(),
 )
 
-/** Everything that narrows the view. All of it is applied in one pass over the file. */
+/**
+ * Everything that narrows the view. All of it is applied in one pass over the file.
+ *
+ * Within a category the choices are alternatives and within a category alone: two levels, two writers or two tags are
+ * read together, because "these two apps" and "these two tags" are ordinary questions. Across categories they are
+ * conditions on the same line, so a level, a writer and a tag chosen together mean all three at once.
+ */
 data class LogQuery(
+    /** Levels to keep; empty for all of them. */
     val levels: Set<LogLevel> = emptySet(),
-    val tag: String? = null,
+    /** Writers to keep, by uid; empty for all of them. */
+    val uids: Set<Int> = emptySet(),
+    /** Tags to keep; empty for all of them. */
+    val tags: Set<String> = emptySet(),
     val text: String = "",
 ) {
     val isActive: Boolean
-        get() = levels.isNotEmpty() || tag != null || text.isNotBlank()
+        get() = levels.isNotEmpty() || uids.isNotEmpty() || tags.isNotEmpty() || text.isNotBlank()
+
+    fun matchesLevel(row: LogRow.Entry): Boolean = levels.isEmpty() || row.level in levels
+
+    fun matchesWriter(row: LogRow.Entry): Boolean = uids.isEmpty() || row.uid in uids
+
+    fun matchesTag(row: LogRow.Entry): Boolean = tags.isEmpty() || row.tag in tags
+
+    fun matchesText(row: LogRow.Entry): Boolean =
+        text.isBlank() ||
+            row.message.contains(text, ignoreCase = true) ||
+            row.tag.contains(text, ignoreCase = true)
 
     fun matches(row: LogRow): Boolean =
         when (row) {
             is LogRow.Entry ->
-                (levels.isEmpty() || row.level in levels) &&
-                    (tag == null || row.tag == tag) &&
-                    (text.isBlank() ||
-                        row.message.contains(text, ignoreCase = true) ||
-                        row.tag.contains(text, ignoreCase = true))
-            // A rotation banner has neither level nor tag, so it survives only a plain text
+                matchesLevel(row) && matchesWriter(row) && matchesTag(row) && matchesText(row)
+            // A rotation banner has no level, no writer and no tag, so it survives only a plain text
             // search. It marks where a writer restarted, which is worth keeping when it can be.
             is LogRow.Marker ->
                 levels.isEmpty() &&
-                    tag == null &&
+                    uids.isEmpty() &&
+                    tags.isEmpty() &&
                     (text.isBlank() || row.text.contains(text, ignoreCase = true))
             is LogRow.DayBreak -> false
         }

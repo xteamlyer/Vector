@@ -5,4 +5,5 @@
     <string name="language_system_summary">هماهنگ با زبانی که روی گوشی تنظیم شده است</string>
     <string name="language_help">کمک به ترجمه</string>
     <string name="language_help_short">ترجمه</string>
+    <string name="language_translated_by">ترجمه: %1$s</string>
 </resources>

@@ -14,6 +14,38 @@ import org.matrix.vector.daemon.system.getSystemServiceManager
 private const val TAG = "VectorSystemServer"
 
 /**
+ * The Android R half of [SystemServerService.registerProxyService], in a class of its own on
+ * purpose.
+ *
+ * `android.os.IServiceCallback` does not exist before Android R, and ART resolves the superclass of
+ * every type a method mentions when it verifies that method, not when the branch mentioning it
+ * runs. Spelling the callback out inside [SystemServerService] therefore made the daemon's very
+ * first call fail to resolve `IServiceCallback$Stub` on Android 9 and log a NoClassDefFoundError,
+ * even though the version gate meant that code was never executed (issue #925). Behind a separate
+ * class the resolution is deferred to this object's initialization, which the gate skips on older
+ * platforms.
+ */
+private object ServiceRegistrationWatcher {
+
+  fun watch(serviceName: String) {
+    val callback =
+        object : IServiceCallback.Stub() {
+          // The IServiceCallback will tell us when the real Android service is ready,
+          // allowing us to capture it and then naturally stop intercepting traffic.
+          override fun onRegistration(name: String, binder: IBinder?) {
+            if (name == serviceName && binder != null) {
+              SystemServerService.adoptOriginService(name, binder)
+            }
+          }
+
+          override fun asBinder(): IBinder = this
+        }
+    runCatching { getSystemServiceManager().registerForNotifications(serviceName, callback) }
+        .onFailure { Log.e(TAG, "Failed to register IServiceCallback", it) }
+  }
+}
+
+/**
  * The daemon's end of the one handshake system_server gets.
  *
  * A plain [Binder] rather than an AIDL stub on purpose. system_server never holds an interface for
@@ -36,22 +68,7 @@ object SystemServerService : Binder(), IBinder.DeathRecipient {
     // `IServiceManager.registerForNotifications` is only available since Android R.
     // On older platforms we simply let the real service replace our proxy in servicemanager.
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      val callback =
-          object : IServiceCallback.Stub() {
-            // The IServiceCallback will tell us when the real Android service is ready,
-            // allowing us to capture it and then naturally stop intercepting traffic.
-            override fun onRegistration(name: String, binder: IBinder?) {
-              if (name == serviceName && binder != null && binder !== this@SystemServerService) {
-                Log.d(TAG, "Intercepted system service registration with name `$name`")
-                originService = binder
-                runCatching { binder.linkToDeath(this@SystemServerService, 0) }
-              }
-            }
-
-            override fun asBinder(): IBinder = this
-          }
-      runCatching { getSystemServiceManager().registerForNotifications(serviceName, callback) }
-          .onFailure { Log.e(TAG, "Failed to register IServiceCallback", it) }
+      ServiceRegistrationWatcher.watch(serviceName)
     }
 
     // The Zygisk module polls this name during `system_server` specialization,
@@ -61,6 +78,17 @@ object SystemServerService : Binder(), IBinder.DeathRecipient {
           proxyServiceName = serviceName
         }
         .onFailure { Log.e(TAG, "Failed to register proxy service `$serviceName`", it) }
+  }
+
+  /**
+   * Adopts the real system service once servicemanager reports its registration, so that
+   * [onTransact] starts forwarding to it. Only ever called from [ServiceRegistrationWatcher].
+   */
+  internal fun adoptOriginService(name: String, binder: IBinder) {
+    if (binder === this) return
+    Log.d(TAG, "Intercepted system service registration with name `$name`")
+    originService = binder
+    runCatching { binder.linkToDeath(this, 0) }
   }
 
   /**

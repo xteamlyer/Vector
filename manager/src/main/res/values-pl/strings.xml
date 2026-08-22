@@ -224,8 +224,6 @@
     <string name="settings_navigation">Nawigacja</string>
     <string name="settings_floating_nav">Pływająca nawigacja</string>
     <string name="settings_floating_nav_summary">Zastępuje pasek małą kulką, którą można przeciągnąć w dowolne miejsce. Przytrzymaj ją, aby rozłożyć panele, lub naciśnij, aby pozostały otwarte.</string>
-    <string name="settings_rearrange_panels">Zmień kolejność paneli</string>
-    <string name="settings_rearrange_panels_summary">Zmień ich kolejność albo ukryj te, których nigdy nie otwierasz.</string>
     <!-- Settings: activity feed -->
     <string name="settings_activity">Strumień aktywności</string>
     <plurals name="settings_window_months">
@@ -427,7 +425,6 @@
     <string name="language_title">Język</string>
     <string name="language_system">Domyślny systemowy</string>
     <string name="language_system_summary">Używaj języka ustawionego w telefonie</string>
-    <string name="language_translated_by">Przetłumaczone przez %1$s</string>
     <string name="language_help_short">Tłumacz</string>
     <string name="language_help">Pomóż tłumaczyć Vector</string>
     <string name="update_title">Aktualizacja frameworka</string>
@@ -463,14 +460,6 @@
     <string name="scope_framework_restart_title">Framework jeszcze tego nie uwzględnił</string>
     <string name="scope_framework_restart_body">Framework systemu jest ładowany jednorazowo, podczas uruchamiania Androida. Zmiana ta pojawi się dopiero po restarcie frameworka — wszystkie działające aplikacje zostają zamknięte, a sam telefon pozostaje włączony.</string>
     <string name="scope_framework_restart_later">Później</string>
-    <string name="settings_network">Sieć</string>
-    <string name="settings_doh">Rozwiązuj nazwy przez HTTPS</string>
-    <string name="settings_doh_summary">Rozwiązuje nazwy przez Cloudflare zamiast przez moduł rozpoznawania nazw sieci. Dla sieci, które blokują lub modyfikują zapytania DNS.</string>
-    <string name="settings_doh_untested">Nie wyszukano jeszcze żadnych nazw.</string>
-    <string name="settings_doh_bypassed">Nieużywane: skonfigurowano serwer proxy, więc to on rozwiązuje nazwy.</string>
-    <string name="settings_doh_working">Działa — %1$s zostało rozwiązane za pośrednictwem Cloudflare.</string>
-    <string name="settings_doh_fell_back">Nie można było połączyć się z Cloudflare (%1$s), więc przez resztę tej sesji używany jest moduł rozpoznawania nazw sieci.</string>
-    <string name="settings_doh_retry">Spróbuj ponownie</string>
     <!-- Getting back into Vector, which parasitically has no launcher icon of its own -->
     <string name="launcher_title">Jak otworzyć Vectora?</string>
     <string name="launcher_body">Vector nie jest zainstalowany jako aplikacja, więc w launcherze nie ma nic do pokazania. Oto sposoby jego otwarcia.</string>

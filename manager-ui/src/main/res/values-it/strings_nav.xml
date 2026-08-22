@@ -12,4 +12,5 @@
     <string name="panels_move_later">Sposta dopo</string>
     <string name="panels_show">Mostra %1$s</string>
     <string name="settings_rearrange_panels">Riordina le sezioni</string>
+    <string name="settings_rearrange_panels_summary">Cambia il loro ordine, o nascondi quelle che non apri mai.</string>
 </resources>

@@ -47,3 +47,9 @@
 
 -repackageclasses
 -allowaccessmodification
+
+# Android R and newer only: the `android.os.IServiceCallback` subclass has to stay in a class of
+# its own, or ART resolves `IServiceCallback$Stub` while verifying registerProxyService and logs a
+# NoClassDefFoundError on older platforms (issue #925). Pinning stops R8 from inlining or merging
+# the holder back into SystemServerService; renaming it is still fine.
+-keep,allowobfuscation class org.matrix.vector.daemon.ipc.ServiceRegistrationWatcher { *; }

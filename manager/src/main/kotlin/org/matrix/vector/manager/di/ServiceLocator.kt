@@ -41,8 +41,8 @@ import org.matrix.vector.manager.data.repository.SettingsRepository
 import org.matrix.vector.manager.ipc.DaemonClient
 import org.matrix.vector.manager.ipc.daemonPackageEventsFlow
 import org.matrix.vector.manager.ipc.packageEventsFlow
-import org.matrix.vector.manager.net.HttpClientFactory
-import org.matrix.vector.manager.net.VectorDns
+import org.matrix.vector.ui.net.HttpClientFactory
+import org.matrix.vector.ui.net.VectorDns
 
 /**
  * Hand-rolled service location, deliberately not a DI framework.
@@ -117,7 +117,7 @@ object ServiceLocator {
     val modules: ModuleRepository by lazy { ModuleRepository(daemon, appScope) }
 
     val apps: AppRepository by lazy {
-        AppRepository(daemon, context.packageManager, moduleDetection)
+        AppRepository(daemon, context.packageManager, moduleDetection, appScope)
     }
 
     /**

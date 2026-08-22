@@ -1,4 +1,4 @@
-package org.matrix.vector.manager.net
+package org.matrix.vector.ui.net
 
 import android.content.Context
 import java.io.File
@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit
 import okhttp3.Cache
 import okhttp3.OkHttp
 import okhttp3.OkHttpClient
-import org.matrix.vector.manager.data.repository.SettingsRepository
 
 /**
  * The one HTTP client the manager uses, for the module store, the GitHub feed and avatars alike.
@@ -35,7 +34,7 @@ object HttpClientFactory {
      */
     class NetStack(val client: OkHttpClient, val dns: VectorDns)
 
-    fun create(context: Context, settings: SettingsRepository): NetStack {
+    fun create(context: Context, settings: NetworkSettings): NetStack {
         // OkHttp's Android artifact ships the public suffix list as an *asset* and reaches it
         // through a process-static Context that `PlatformInitializer` sets from `androidx.startup`.
         // Parasitically this app's manifest is never installed, so that provider never runs and the

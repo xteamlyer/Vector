@@ -134,8 +134,6 @@
     <string name="settings_navigation">Gezinme</string>
     <string name="settings_floating_nav">Yüzen gezinme</string>
     <string name="settings_floating_nav_summary">Çubuğu, istediğiniz yere sürükleyebileceğiniz küçük bir topla değiştirir. Panelleri yelpaze gibi açmak için basılı tutun, açık kalmaları için dokunun.</string>
-    <string name="settings_rearrange_panels">Panelleri yeniden düzenle</string>
-    <string name="settings_rearrange_panels_summary">Sıralarını değiştirin ya da hiç açmadıklarınızı gizleyin.</string>
 
     <string name="settings_activity">Hareket akışı</string>
     <plurals name="settings_window_months">
@@ -262,7 +260,6 @@
     <string name="language_system">Sistem varsayılanı</string>
     <string name="language_system_summary">Telefonda ayarlı dili izle</string>
 
-    <string name="language_translated_by">Çeviren: %1$s</string>
     <string name="language_help_short">Çevir</string>
     <string name="language_help">Vector\'ü çevirmeye yardım edin</string>
 
@@ -402,15 +399,6 @@
     <string name="scope_framework_restart_title">Çatı bunu henüz almadı</string>
     <string name="scope_framework_restart_body">Sistem çatısı yalnızca bir kez, Android başlarken yüklenir. Bu değişiklik ona ancak çatı yeniden başlatıldığında ulaşır — çalışan tüm uygulamalar kapanır, telefonun kendisi açık kalır.</string>
     <string name="scope_framework_restart_later">Daha sonra</string>
-    <string name="settings_network">Ağ</string>
-    <string name="settings_doh">Adları HTTPS üzerinden çöz</string>
-    <string name="settings_doh_summary">Adları ağın çözümleyicisi yerine Cloudflare üzerinden çözer. DNS\'i engelleyen veya kurcalayan ağlar için.</string>
-    <string name="settings_doh_untested">Henüz hiçbir ad çözümlenmedi.</string>
-    <string name="settings_doh_bypassed">Kullanılmıyor: bir proxy yapılandırılmış, adları o çözümlüyor.</string>
-    <string name="settings_doh_working">Çalışıyor — %1$s Cloudflare üzerinden çözümlendi.</string>
-    <string name="settings_doh_fell_back">Cloudflare\'a ulaşılamadı (%1$s), bu oturumun kalanında ağın çözümleyicisi kullanılacak.</string>
-    <string name="settings_doh_retry">Yeniden dene</string>
-
     <string name="launcher_title">Vector nasıl açılır</string>
     <string name="launcher_body">Vector uygulama olarak kurulu değil, bu yüzden başlatıcınızın gösterecek bir şeyi yok. Geri dönmenin yolları şunlar.</string>
     <string name="launcher_shortcut">Ana ekran kısayolu</string>

@@ -3,6 +3,16 @@ val versionCodeProvider = rootProject.extra["versionCodeProvider"] as Provider<S
 @Suppress("UNCHECKED_CAST")
 val versionNameProvider = rootProject.extra["versionNameProvider"] as Provider<String>
 
+/**
+ * Whoever is building this framework, which is who a module is loaded by.
+ *
+ * Included in another build -- a patcher that ships this code inside an app rather than a daemon --
+ * the framework a module answers to is that build's, so its name is the one reported. The version
+ * already resolves that way, being read from the repository the build was invoked in.
+ */
+val frameworkName: String =
+    runCatching { gradle.parent?.rootProject?.name }.getOrNull() ?: rootProject.name
+
 plugins {
     alias(libs.plugins.agp.lib)
     alias(libs.plugins.ktfmt)
@@ -17,7 +27,7 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
-        buildConfigField("String", "FRAMEWORK_NAME", """"${rootProject.name}"""")
+        buildConfigField("String", "FRAMEWORK_NAME", """"${frameworkName}"""")
         buildConfigField("String", "VERSION_NAME", """"${versionNameProvider.get()}"""")
         buildConfigField("long", "VERSION_CODE", versionCodeProvider.get())
     }

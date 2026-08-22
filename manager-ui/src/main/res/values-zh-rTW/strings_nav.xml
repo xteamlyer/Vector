@@ -12,4 +12,5 @@
     <string name="panels_show">顯示%1$s</string>
     <string name="settings_rearrange_panels">重新排列面板</string>
     <string name="nav_manage">管理</string>
+    <string name="settings_rearrange_panels_summary">調整順序，或隱藏從不開啟的面板。</string>
 </resources>

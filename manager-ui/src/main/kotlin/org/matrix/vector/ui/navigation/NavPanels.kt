@@ -1,6 +1,7 @@
 package org.matrix.vector.ui.navigation
 
 import androidx.compose.runtime.Immutable
+import androidx.navigation3.runtime.NavKey
 
 /**
  * Which panels the navigation container shows, in which order, and which of them are hidden.
@@ -12,8 +13,8 @@ import androidx.compose.runtime.Immutable
  * cannot produce a state the rest of the app has no answer for.
  *
  * [order] holds every panel, hidden ones included. Hiding is the reader's opinion of the container
- * and not a deletion — a panel that is not drawn still needs its route registration, because a back
- * stack saved before it was hidden still names it.
+ * and not a deletion — a panel that is not drawn still needs its route type and its registration
+ * with whatever renders the stack, because a stack saved before it was hidden still names it.
  */
 @Immutable
 data class NavPanels(val order: List<TopLevelDestination>, val hidden: Set<String>) {
@@ -36,7 +37,7 @@ data class NavPanels(val order: List<TopLevelDestination>, val hidden: Set<Strin
 
     fun isHidden(destination: TopLevelDestination): Boolean = destination.key in hidden
 
-    fun isVisible(key: String): Boolean = visible.any { it.key == key }
+    fun isVisible(route: NavKey): Boolean = visible.any { it.route == route }
 
     /** False on the last visible panel: a badge that does nothing is never offered. */
     fun canHide(destination: TopLevelDestination): Boolean =

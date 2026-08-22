@@ -12,4 +12,5 @@
     <string name="panels_show">إظهار %1$s</string>
     <string name="settings_rearrange_panels">إعادة ترتيب الأقسام</string>
     <string name="nav_manage">الإدارة</string>
+    <string name="settings_rearrange_panels_summary">غيّر ترتيبها، أو أخفِ ما لا تفتحه أبدًا.</string>
 </resources>

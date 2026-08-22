@@ -134,8 +134,6 @@
     <string name="settings_navigation">Navigazione</string>
     <string name="settings_floating_nav">Navigazione fluttuante</string>
     <string name="settings_floating_nav_summary">Sostituisce la barra con una pallina che puoi trascinare dove vuoi. Tienila premuta per aprire a ventaglio le sezioni, o toccala per lasciarle aperte.</string>
-    <string name="settings_rearrange_panels">Riordina le sezioni</string>
-    <string name="settings_rearrange_panels_summary">Cambia il loro ordine, o nascondi quelle che non apri mai.</string>
 
     <string name="settings_activity">Attività</string>
     <plurals name="settings_window_months">
@@ -262,7 +260,6 @@
     <string name="language_system">Predefinita di sistema</string>
     <string name="language_system_summary">Segui la lingua impostata sul telefono</string>
 
-    <string name="language_translated_by">Tradotto da %1$s</string>
     <string name="language_help_short">Traduci</string>
     <string name="language_help">Aiuta a tradurre Vector</string>
 
@@ -402,15 +399,6 @@
     <string name="scope_framework_restart_title">Il framework non ha ancora recepito la modifica</string>
     <string name="scope_framework_restart_body">Il framework di sistema viene caricato una sola volta, all\'avvio di Android. Questa modifica lo raggiunge solo quando il framework viene riavviato: tutte le app in esecuzione si chiudono e il telefono resta acceso.</string>
     <string name="scope_framework_restart_later">Più tardi</string>
-    <string name="settings_network">Rete</string>
-    <string name="settings_doh">Risolvere i nomi via HTTPS</string>
-    <string name="settings_doh_summary">Risolve i nomi tramite Cloudflare invece che con il resolver della rete. Per reti che bloccano o alterano il DNS.</string>
-    <string name="settings_doh_untested">Nessun nome ancora risolto.</string>
-    <string name="settings_doh_bypassed">Non in uso: è configurato un proxy, quindi è lui a risolvere i nomi.</string>
-    <string name="settings_doh_working">Funziona — %1$s è stato risolto tramite Cloudflare.</string>
-    <string name="settings_doh_fell_back">Cloudflare non è raggiungibile (%1$s), quindi per il resto di questa sessione viene usato il resolver della rete.</string>
-    <string name="settings_doh_retry">Riprova</string>
-
     <string name="launcher_title">Come aprire Vector</string>
     <string name="launcher_body">Vector non è installato come app, quindi il tuo launcher non ha nulla da mostrare. Questi sono i modi per tornarci.</string>
     <string name="launcher_shortcut">Scorciatoia nella schermata Home</string>

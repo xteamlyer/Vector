@@ -7,9 +7,8 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.yield
 import org.matrix.vector.ui.logs.LogContent
-import org.matrix.vector.ui.logs.LogFacets
+import org.matrix.vector.ui.logs.LogFacetCounter
 import org.matrix.vector.ui.logs.LogIndex
-import org.matrix.vector.ui.logs.LogLevel
 import org.matrix.vector.ui.logs.LogQuery
 import org.matrix.vector.ui.logs.LogRow
 import org.matrix.vector.ui.logs.LogScanResult
@@ -211,8 +210,7 @@ class LogFile(pfd: ParcelFileDescriptor) : LogContent {
         onProgress: (Float) -> Unit,
     ): LogScanResult {
         val matches = if (query.isActive) IntVec() else null
-        val tags = HashMap<String, Int>()
-        val levels = HashMap<LogLevel, Int>()
+        val facets = LogFacetCounter(query)
         var previousMatched = false
         // The last row that was an entry, which is what lets a line be read as part of its message
         // here exactly as [readRows] reads it — both the unprefixed kind and the split-off tail.
@@ -236,23 +234,14 @@ class LogFile(pfd: ParcelFileDescriptor) : LogContent {
                 if (previousMatched) matches?.add(lineIndex)
                 return@forEachLine
             }
-            if (row is LogRow.Entry) {
-                tags[row.tag] = (tags[row.tag] ?: 0) + 1
-                levels[row.level] = (levels[row.level] ?: 0) + 1
-            }
             lastEntry = row as? LogRow.Entry
-            previousMatched = query.matches(row)
+            // The daemon's framing carries the writer's uid, so the same pass that decides what the
+            // query keeps also counts the log's processes, its tags and its levels for the filter.
+            previousMatched = facets.add(row)
             if (previousMatched) matches?.add(lineIndex)
         }
 
-        return LogScanResult(
-            matches = matches?.toArray(),
-            facets =
-                LogFacets(
-                    tags = tags.entries.sortedByDescending { it.value }.map { it.key to it.value },
-                    levels = levels,
-                ),
-        )
+        return LogScanResult(matches = matches?.toArray(), facets = facets.facets())
     }
 
     override fun close() {

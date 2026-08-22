@@ -53,9 +53,9 @@ import org.matrix.vector.manager.data.github.GitHubRepository
 import org.matrix.vector.manager.data.log.logArchiveName
 import org.matrix.vector.manager.di.ServiceLocator
 import org.matrix.vector.manager.logE
-import org.matrix.vector.manager.ui.components.SnackbarTone
-import org.matrix.vector.manager.ui.components.VectorSnackbarHost
-import org.matrix.vector.manager.ui.components.show
+import org.matrix.vector.ui.SnackbarTone
+import org.matrix.vector.ui.SharedSnackbarHost
+import org.matrix.vector.ui.show
 
 /**
  * What to try, and what to bring, before opening an issue.
@@ -116,7 +116,7 @@ fun TroubleshootScreen(
         }
 
     Scaffold(
-        snackbarHost = { VectorSnackbarHost(snackbars) },
+        snackbarHost = { SharedSnackbarHost(snackbars) },
         // Docked rather than last in the list. It is where the screen is heading, and a reader who
         // has decided to file anyway should not have to scroll past the advice to do it.
         bottomBar = {
