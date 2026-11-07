@@ -76,8 +76,6 @@ object FileSystem {
   private val reinjectionOwnerLockPath: Path = basePath.resolve("vector_reinjection_owner.lock")
   private val reinjectionRestartLockPath: Path = basePath.resolve("vector_reinjection_restart.lock")
   private val reinjectionRound = AtomicLong(0)
-  private var fileLock: FileLock? = null
-  private var lockChannel: FileChannel? = null
 
   data class ReinjectionOwner(val instanceId: String, val pid: Int, val claimedAtMillis: Long) {
     fun toLogString(): String = "$instanceId(pid=$pid, claimedAt=$claimedAtMillis)"
@@ -178,10 +176,25 @@ object FileSystem {
   fun tryLock(): Boolean {
     return runCatching {
           preparePrivateFile(lockPath)
-          lockChannel =
+          val channel =
               FileChannel.open(lockPath, setOf(StandardOpenOption.CREATE, StandardOpenOption.WRITE))
-          fileLock = lockChannel?.tryLock()
-          fileLock?.isValid == true
+          var retained = false
+          try {
+            val lock = channel.tryLock() ?: return@runCatching false
+            if (!lock.isValid) return@runCatching false
+
+            // The VM retains the hook and its captured references even in an R8 release build.
+            Runtime.getRuntime()
+                .addShutdownHook(
+                    Thread {
+                      runCatching { lock.release() }
+                      runCatching { channel.close() }
+                    })
+            retained = true
+            true
+          } finally {
+            if (!retained) channel.close()
+          }
         }
         .getOrDefault(false)
   }
