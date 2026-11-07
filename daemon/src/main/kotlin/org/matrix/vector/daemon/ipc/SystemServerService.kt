@@ -52,23 +52,17 @@ object SystemServerService : ILSPSystemServerService.Stub(), IBinder.DeathRecipi
     // Register as the service name early to setup an IPC for `system_server`.
     Log.d(TAG, "Registering bridge service for `system_server` with name `$serviceName`.")
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      runCatching {
-            if (!callbackRegistered || proxyServiceName != serviceName) {
-              ServiceRegistrationWatcher.watch(serviceName)
-              callbackRegistered = true
-            }
-            ServiceManager.addService(serviceName, this)
-            proxyServiceName = serviceName
-          }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && serviceName == "serial" &&
+        !callbackRegistered) {
+      runCatching { ServiceRegistrationWatcher.watch(serviceName) }
+          .onSuccess { callbackRegistered = true }
           .onFailure { Log.e(TAG, "Failed to register IServiceCallback", it) }
-    } else {
-      runCatching {
-            ServiceManager.addService(serviceName, this)
-            proxyServiceName = serviceName
-          }
-          .onFailure { Log.e(TAG, "Failed to register proxy service `$serviceName`", it) }
     }
+    runCatching {
+          ServiceManager.addService(serviceName, this)
+          proxyServiceName = serviceName
+        }
+        .onFailure { Log.e(TAG, "Failed to register proxy service `$serviceName`", it) }
   }
 
   internal fun adoptOriginService(name: String, binder: IBinder) {
@@ -92,8 +86,7 @@ object SystemServerService : ILSPSystemServerService.Stub(), IBinder.DeathRecipi
             round?.let { " round=$it" }.orEmpty())
     binderDied()
     systemServerRequested = false
-    runCatching { ServiceManager.addService(name, this) }
-        .onFailure { Log.w(TAG, "Failed to re-claim proxy service `$name`", it) }
+    registerProxyService(name)
   }
 
   override fun requestApplicationService(

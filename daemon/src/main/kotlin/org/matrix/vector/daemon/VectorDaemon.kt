@@ -45,8 +45,14 @@ object VectorDaemon {
   val scope = CoroutineScope(Dispatchers.IO + SupervisorJob() + exceptionHandler)
   val bridgeServiceName = "activity"
 
-  var isLateInject = false
-  var proxyServiceName = "serial"
+  // Keep the BinderProxy reachable for as long as its death notification is needed.
+  private val bridgeBinder = java.util.concurrent.atomic.AtomicReference<IBinder>()
+
+  @Volatile var isLateInject = false
+    private set
+
+  private val proxyServiceName: String
+    get() = if (isLateInject) "serial_vector" else "serial"
 
   @JvmStatic
   fun main(args: Array<String>) {
@@ -64,9 +70,11 @@ object VectorDaemon {
         systemServerMaxRetry = arg.substringAfter('=').toIntOrNull() ?: 1
       } else if (arg == "--late-inject") {
         isLateInject = true
-        proxyServiceName = "serial_vector"
       }
     }
+
+    // NeoZygisk may run service.sh without passing --late-inject.
+    isLateInject = isLateInject || ServiceManager.checkService(bridgeServiceName) != null
 
     Log.i(
         TAG,
@@ -172,7 +180,8 @@ object VectorDaemon {
           val deathRecipient =
               object : IBinder.DeathRecipient {
                 override fun binderDied() {
-                  bridgeService.unlinkToDeath(this, 0)
+                  if (!bridgeBinder.compareAndSet(bridgeService, null)) return
+                  runCatching { bridgeService.unlinkToDeath(this, 0) }
 
                   val leaseResult = FileSystem.tryAcquireReinjectionLease(daemonInstanceId)
                   when (leaseResult.status) {
@@ -205,6 +214,8 @@ object VectorDaemon {
                           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                             Dex2OatServer.refreshMount()
                           }
+                          // The replacement system_server specializes as a cold start.
+                          isLateInject = false
                           SystemServerService.prepareForSystemServerRestart(
                               proxyServiceName, daemonInstanceId, lease.round)
                           ManagerService.guard = null // Remove dead guard
@@ -227,7 +238,13 @@ object VectorDaemon {
                   }
                 }
               }
-          bridgeService.linkToDeath(deathRecipient, 0)
+          bridgeBinder.set(bridgeService)
+          try {
+            bridgeService.linkToDeath(deathRecipient, 0)
+          } catch (e: android.os.RemoteException) {
+            bridgeBinder.compareAndSet(bridgeService, null)
+            throw e
+          }
 
           // Try sending the Binder payload (up to 3 times)
           var success = false

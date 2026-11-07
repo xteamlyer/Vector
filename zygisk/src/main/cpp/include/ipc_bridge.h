@@ -47,6 +47,13 @@ public:
     lsplant::ScopedLocalRef<jobject> RequestAppBinder(JNIEnv *env, jstring nice_name);
 
     /**
+     * @brief Tells whether a system_server is already serving binder calls.
+     * @param env JNI environment pointer.
+     * @return True if the rendezvous service of running applications answers.
+     */
+    bool IsSystemServerRunning(JNIEnv *env);
+
+    /**
      * @brief Requests the system_server's dedicated Binder from the host service.
      * @param env JNI environment pointer.
      * @param bridgeServiceName rendezvous point used by the system_server
@@ -133,6 +140,7 @@ private:
     // android.os.ServiceManager
     jclass service_manager_class_ = nullptr;
     jmethodID get_service_method_ = nullptr;
+    jmethodID check_service_method_ = nullptr;
 
     // android.os.IBinder
     jmethodID transact_method_ = nullptr;
