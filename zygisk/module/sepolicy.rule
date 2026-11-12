@@ -13,3 +13,6 @@ allow zygote dex2oat unix_stream_socket *
 type xposed_data file_type
 typeattribute xposed_data mlstrustedobject
 allow * xposed_data {file dir} *
+
+# `serial_vector` is in no service_contexts, so it is labelled default_android_service
+allow system_server default_android_service service_manager find

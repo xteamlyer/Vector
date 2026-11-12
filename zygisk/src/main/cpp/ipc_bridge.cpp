@@ -159,6 +159,13 @@ void IPCBridge::Initialize(JNIEnv *env) {
         LOGE("IPCBridge: ServiceManager.getService method not found!");
         return;
     }
+    // IsSystemServerRunning needs it: checkService asks servicemanager whether it holds the
+    // name now. Its absence costs only the probe, leaving LATE_INJECT to answer on its own.
+    check_service_method_ = lsplant::JNI_GetStaticMethodID(
+        env, service_manager_class_, "checkService", "(Ljava/lang/String;)Landroid/os/IBinder;");
+    if (!check_service_method_) {
+        LOGW("IPCBridge: ServiceManager.checkService method not found.");
+    }
 
     // IBinder
     auto ibinder_class = lsplant::ScopedLocalRef(env, env->FindClass("android/os/IBinder"));
@@ -297,6 +304,19 @@ lsplant::ScopedLocalRef<jobject> IPCBridge::RequestAppBinder(JNIEnv *env, jstrin
     }
 
     return result_binder;
+}
+
+bool IPCBridge::IsSystemServerRunning(JNIEnv *env) {
+    if (!initialized_ || !check_service_method_) {
+        return false;
+    }
+
+    // kBridgeServiceName is published by system_server well after it is specialized, so nothing
+    // answers at boot and the live service answers once it has booted without us.
+    auto service_name = lsplant::ScopedLocalRef(env, env->NewStringUTF(kBridgeServiceName.data()));
+    auto binder = lsplant::JNI_CallStaticObjectMethod(env, service_manager_class_,
+                                                      check_service_method_, service_name.get());
+    return binder.get() != nullptr;
 }
 
 lsplant::ScopedLocalRef<jobject> IPCBridge::RequestSystemServerBinder(

@@ -16,6 +16,17 @@ public class ServiceManager {
     }
 
     /**
+     * Returns a reference to a service with the given name if one is already registered.
+     *
+     * @param name the name of the service to get
+     * @return a reference to the service, or <code>null</code> if the service doesn't exist
+     */
+    @Nullable
+    public static IBinder checkService(String name) {
+        throw new RuntimeException("STUB");
+    }
+
+    /**
      * Place a new @a service called @a name into the service
      * manager.
      *

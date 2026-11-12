@@ -23,6 +23,14 @@ Adaptation: <why a direct cherry-pick was not used>
 
 ## Current backport map
 
+### 2026-11-06 update
+
+- `569048119f0c1071b3d5069b645cfd4526b7ee8e`: retained the daemon lock and channel through a VM shutdown hook, preserving SR private-file preparation and the separate reinjection lease.
+- `420942085be83b7b78034eed48b066bd01eab2a7`: cherry-picked the four legacy resource hook fixes.
+- `eaffc816ee78bb4acd45fc42ed1e07a892e8dc46`: adapted late-load service detection, SELinux lookup, daemon bootstrap, and the cold-service handoff to SR's existing AIDL, owner and lease flow. The explicit late-load option and SR restart retries remain supported. Upstream's service unregistration and Binder protocol replacement are outside this backport.
+- `93d6647333fb827aa555b5e781e1e626d5320860`: cherry-picked eviction of the parasitic Manager host's pre-cached LoadedApk.
+- `7b4688fd5452b4c5389a2895877718689f31f3c0`: ported the two pre-R Manager launch fallbacks. SR already registers the injection proxy on those versions.
+
 ### 2026-10-24 update
 
 - `82112f99ae5b9aa66940e35bfc27c813a6673bc7`: adapted resource-cache isolation from tmpfs to a freshly recreated private bind source. Vector-SR additionally stops startup if cleanup, directory creation or mounting fails. The existing private mount namespace and SR recovery remain unchanged.

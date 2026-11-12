@@ -1,6 +1,9 @@
-# Extract the directory path and change directory 
+# Extract the directory path and change directory
 MODDIR="${0%/*}"
 cd "$MODDIR" || exit 1
 
-# Start the daemon directly in the background within a private mount namespace
-unshare --propagation slave -m "$MODDIR/daemon" --system-server-max-retry=3 "$@" &
+# A NeoZygisk late start can call this with Android's toybox instead of a root manager's BusyBox.
+unshare -m /system/bin/sh -c '
+    mount -o rslave none / || exit 1
+    exec "$0" "$@"
+' "$MODDIR/daemon" --system-server-max-retry=3 "$@" &
